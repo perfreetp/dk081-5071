@@ -57,6 +57,29 @@ const MessagesPage: React.FC = () => {
       markRead(item.id)
     }
     if (item.relatedId) {
+      const pages = Taro.getCurrentPages()
+      // 检查页面栈中是否已存在相同 id 的详情页
+      const existIdx = pages.findIndex((p: any) => {
+        const route = p.route || p.$taroPath || ''
+        if (!route.includes('pages/detail/index')) return false
+        const opts = p.options || (p as any).$taroParams || {}
+        return opts.id === item.relatedId
+      })
+      if (existIdx >= 0) {
+        // 已存在：回退到那一页而不是新开
+        const delta = pages.length - 1 - existIdx
+        if (delta > 0) {
+          Taro.navigateBack({ delta })
+          return
+        }
+      }
+      // 检查当前栈顶是否就是任意 detail 页（不同 id），是则替换而不是叠加
+      const top = pages[pages.length - 1]
+      const topRoute = (top as any)?.route || (top as any)?.$taroPath || ''
+      if (topRoute.includes('pages/detail/index')) {
+        Taro.redirectTo({ url: `/pages/detail/index?id=${item.relatedId}` })
+        return
+      }
       Taro.navigateTo({ url: `/pages/detail/index?id=${item.relatedId}` })
       return
     }

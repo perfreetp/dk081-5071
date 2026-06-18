@@ -4,6 +4,7 @@ import Taro from '@tarojs/taro'
 import PageContainer from '@/components/PageContainer'
 import { useDeclarationsStore } from '@/store/declarations'
 import { maskIdCard, maskPhone } from '@/utils/validator'
+import { buildTimeline } from '@/data/declarations'
 import type { Declaration, TimelineNode } from '@/types'
 import styles from './index.module.scss'
 
@@ -30,48 +31,12 @@ const DetailPage: React.FC = () => {
     if (declaration.timeline && declaration.timeline.length > 0) {
       return declaration.timeline
     }
-    // fallback to legacy statusSteps
-    const defaultNodes: TimelineNode[] = []
-    const order: Declaration['status'][] = ['submitted', 'reviewing', 'correction', 'approved', 'paid', 'completed']
-    const labels: Record<string, { title: string; desc: string }> = {
-      submitted: { title: '已提交申报', desc: '申报已成功提交' },
-      accepted: { title: '已受理', desc: '登记机构已受理' },
-      reviewing: { title: '材料审核中', desc: '工作人员正在审核您的材料' },
-      correction: { title: '待补正材料', desc: '请按要求补充或修正材料' },
-      approved: { title: '审核通过', desc: '材料审核通过' },
-      paid: { title: '待取证/邮寄', desc: '税费已缴纳' },
-      completed: { title: '登记完成', desc: '证件已制作发放' }
-    }
-    const curIdx = order.indexOf(declaration.status)
-    order.forEach((s, idx) => {
-      if (idx === 0 && curIdx >= 0) {
-        defaultNodes.push({
-          key: 'submitted',
-          title: labels.submitted.title,
-          desc: labels.submitted.desc,
-          time: declaration.createTime,
-          status: curIdx >= 0 ? 'done' : 'pending'
-        })
-        defaultNodes.push({
-          key: 'accepted',
-          title: labels.accepted.title,
-          desc: labels.accepted.desc,
-          time: declaration.createTime,
-          status: curIdx >= 1 ? 'done' : 'active'
-        })
-      }
-      if (idx === 0) return
-      const label = labels[s] || { title: s, desc: '' }
-      if (idx > curIdx + 2) return
-      defaultNodes.push({
-        key: s,
-        title: label.title,
-        desc: label.desc,
-        time: declaration.updateTime,
-        status: idx < curIdx ? 'done' : idx === curIdx ? 'active' : 'pending'
-      })
+    // fallback：根据 status 统一构建
+    return buildTimeline(declaration.status, declaration.createTime, declaration.updateTime, {
+      correctionSubmitted: declaration.correctionSubmitted,
+      correctionSubmitTime: declaration.correctionSubmitTime,
+      hadCorrection: !!declaration.correctionOpinion
     })
-    return defaultNodes
   }, [declaration])
 
   const getStatusColor = (status: string) => {
@@ -97,12 +62,15 @@ const DetailPage: React.FC = () => {
 
   const handleCorrection = () => {
     if (!declaration) return
+    const ids = (declaration.correctionMaterials || []).join(',')
     Taro.showModal({
       title: '补正材料',
       content: `共需补正 ${correctionMaterials.length} 份材料，确认前往上传页面补传？`,
       success: (res) => {
         if (res.confirm) {
-          Taro.navigateTo({ url: '/pages/upload/index?correction=1' })
+          Taro.navigateTo({
+            url: `/pages/upload/index?correction=1&declarationId=${declaration.id}&materialIds=${encodeURIComponent(ids)}`
+          })
         }
       }
     })
@@ -110,7 +78,6 @@ const DetailPage: React.FC = () => {
 
   const handleSubmitCorrection = () => {
     if (!declaration) return
-    // check required correction materials uploaded
     const allUploaded = correctionMaterials.every((m) => m.uploaded)
     if (!allUploaded) {
       Taro.showToast({ title: '请先完成全部补正材料上传', icon: 'none' })
@@ -125,26 +92,11 @@ const DetailPage: React.FC = () => {
           const pad = (n: number) => String(n).padStart(2, '0')
           const submitTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
 
-          const newTimeline: TimelineNode[] = [
-            ...(declaration.timeline || []).map((n) => {
-              if (n.key === 'correction') return { ...n, status: 'done' as const }
-              return n
-            }),
-            {
-              key: 'correctionSubmitted',
-              title: '补正材料已提交',
-              desc: '补正材料已重新提交，等待复审',
-              time: submitTime,
-              status: 'active'
-            },
-            {
-              key: 'reviewing',
-              title: '材料复审中',
-              desc: '工作人员正在复审您补正后的材料',
-              time: submitTime,
-              status: 'pending'
-            }
-          ]
+          const newTimeline = buildTimeline('reviewing', declaration.createTime, submitTime, {
+            correctionSubmitted: true,
+            correctionSubmitTime: submitTime,
+            correctionTime: declaration.timeline?.find((n) => n.key === 'correction')?.time
+          })
 
           updateDeclaration(declaration.id, {
             status: 'reviewing',

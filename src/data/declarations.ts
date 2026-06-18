@@ -1,6 +1,16 @@
 import type { Declaration, TimelineNode } from '@/types'
 
-function buildTimeline(
+/**
+ * 按真实办件顺序生成完整办理轨迹，节点数固定为 6~8 个：
+ *   已提交 → 已受理 → 审核中 → [待补正 → 补正已提交] → 审核通过 → 待缴费 → 待取证/邮寄 → 登记完成
+ * 规则：
+ *   1. active 节点严格与 status 对齐（顶部 badge 显示什么就高亮什么）
+ *   2. active 之前的节点一律 done，之后的一律 pending
+ *   3. 审核通过前 correction / correctionSubmitted 不出现；之后如果发生过补正则保留为 done
+ *   4. paid / completed 等后续节点作为"待办理"节点始终可见（pending/done）
+ *   5. 若 correctionSubmitted=true，说明已提交补正且已进入复审，此时 active 为 reviewing
+ */
+export function buildTimeline(
   status: Declaration['status'],
   createTime: string,
   updateTime: string,
@@ -9,75 +19,101 @@ function buildTimeline(
     correctionSubmitTime?: string
     correctionTime?: string
     paidTime?: string
+    approvedTime?: string
+    completedTime?: string
+    hadCorrection?: boolean
   }
 ): TimelineNode[] {
-  const nodes: TimelineNode[] = [
-    { key: 'submitted', title: '已提交申报', desc: '申报已成功提交，等待登记机构受理', time: createTime, status: 'done' },
-    { key: 'accepted', title: '已受理', desc: '登记机构已受理您的申报，正在排期审核', time: createTime, status: status === 'submitted' ? 'pending' : 'done' },
-    { key: 'reviewing', title: '材料审核中', desc: '工作人员正在审核您提交的全部材料', time: updateTime, status: 'pending' },
-    { key: 'correction', title: '待补正材料', desc: '请按意见补充或修正材料后重新提交', time: extra?.correctionTime || updateTime, status: 'pending' },
-    { key: 'correctionSubmitted', title: '补正材料已提交', desc: '补正材料已重新提交，等待复审', time: extra?.correctionSubmitTime || updateTime, status: 'pending' },
-    { key: 'approved', title: '审核通过', desc: '材料审核通过，已生成税费信息', time: updateTime, status: 'pending' },
-    { key: 'paid', title: '待取证/邮寄', desc: '税费已缴纳，等待证件制作与发放', time: extra?.paidTime || updateTime, status: 'pending' },
-    { key: 'completed', title: '登记完成', desc: '登记已完成，证件已制作发放', time: updateTime, status: 'pending' }
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const plusMinutes = (t: string, mins: number) => {
+    const d = new Date(t.replace(/-/g, '/'))
+    if (isNaN(d.getTime())) return t
+    d.setMinutes(d.getMinutes() + mins)
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+  }
+
+  // 预计算各阶段的展示时间（尽量贴合真实办件节奏）
+  const tSubmitted = createTime
+  const tAccepted = extra?.correctionTime ? plusMinutes(createTime, 5) : plusMinutes(createTime, 3)
+  const tReviewingStart = plusMinutes(createTime, 30)
+  const tCorrection = extra?.correctionTime || plusMinutes(tReviewingStart, 60 * 6)
+  const tCorrectionSubmitted = extra?.correctionSubmitTime || plusMinutes(tCorrection, 60 * 24)
+  const tApproved = extra?.approvedTime || plusMinutes(tReviewingStart, 60 * 24 * 2)
+  const tPaid = extra?.paidTime || plusMinutes(tApproved, 60 * 24)
+  const tCompleted = extra?.completedTime || plusMinutes(tPaid, 60 * 24 * 2)
+
+  const baseNodes: TimelineNode[] = [
+    { key: 'submitted', title: '已提交申报', desc: '申报已成功提交，等待登记机构受理', time: tSubmitted, status: 'pending' },
+    { key: 'accepted', title: '已受理', desc: '登记机构已受理您的申报，正在排期审核', time: tAccepted, status: 'pending' },
+    { key: 'reviewing', title: '材料审核中', desc: '工作人员正在审核您提交的全部材料', time: tReviewingStart, status: 'pending' }
   ]
 
-  const order: Declaration['status'][] = ['submitted', 'reviewing', 'correction', 'approved', 'paid', 'completed']
-  const curIdx = order.indexOf(status)
+  // 补正相关节点：发生过补正（hadCorrection）或当前正处于待补正/复审中则展示
+  const showCorrection =
+    status === 'correction' ||
+    !!extra?.correctionSubmitted ||
+    !!extra?.hadCorrection
 
-  nodes.forEach((n) => {
-    if (n.key === 'accepted') {
-      n.status = status === 'submitted' ? 'active' : 'done'
-      return
+  if (showCorrection) {
+    baseNodes.push({ key: 'correction', title: '待补正材料', desc: '请按意见补充或修正材料后重新提交', time: tCorrection, status: 'pending' })
+    if (status !== 'correction' || !!extra?.correctionSubmitted) {
+      baseNodes.push({ key: 'correctionSubmitted', title: '补正材料已提交', desc: '补正材料已重新提交，等待复审', time: tCorrectionSubmitted, status: 'pending' })
+      // 复审中节点（补正提交后会回到审核）
+      baseNodes.push({ key: 'reviewing2', title: '材料复审中', desc: '工作人员正在复审您补正后的材料', time: tCorrectionSubmitted, status: 'pending' })
     }
-    if (n.key === 'correctionSubmitted') {
-      if (extra?.correctionSubmitted) {
-        n.status = 'done'
-      }
-      return
+  }
+
+  baseNodes.push(
+    { key: 'approved', title: '审核通过', desc: '材料审核通过，已生成税费信息', time: tApproved, status: 'pending' },
+    { key: 'payment', title: '待缴费', desc: '已生成税费单，请在规定时间内完成缴费', time: tApproved, status: 'pending' },
+    { key: 'paid', title: '待取证/邮寄', desc: '税费已缴纳，等待证件制作与发放', time: tPaid, status: 'pending' },
+    { key: 'completed', title: '登记完成', desc: '登记已完成，不动产权证书已制作发放', time: tCompleted, status: 'pending' }
+  )
+
+  // activeKey 决定当前高亮的节点
+  let activeKey: string
+  switch (status) {
+    case 'submitted':
+      activeKey = 'submitted'
+      break
+    case 'reviewing':
+      // 有补正提交记录说明当前在复审阶段，高亮 reviewing2
+      activeKey = !!extra?.correctionSubmitted ? 'reviewing2' : 'reviewing'
+      break
+    case 'correction':
+      activeKey = 'correction'
+      break
+    case 'approved':
+      activeKey = 'payment' // 审核通过后就进入待缴费阶段
+      break
+    case 'paid':
+      activeKey = 'paid'
+      break
+    case 'completed':
+      activeKey = 'completed'
+      break
+    case 'rejected':
+      activeKey = 'reviewing'
+      break
+    default:
+      activeKey = 'reviewing'
+  }
+
+  // 标记 done / active / pending
+  const activeIndex = baseNodes.findIndex((n) => n.key === activeKey)
+  baseNodes.forEach((n, i) => {
+    if (activeIndex === -1) {
+      n.status = i === 0 ? 'active' : 'pending'
+    } else if (i < activeIndex) {
+      n.status = 'done'
+    } else if (i === activeIndex) {
+      n.status = 'active'
+    } else {
+      n.status = 'pending'
     }
-    const idx = order.indexOf(n.key as Declaration['status'])
-    if (idx === -1) return
-    if (idx < curIdx) n.status = 'done'
-    else if (idx === curIdx) n.status = 'active'
-    else n.status = 'pending'
   })
 
-  if (status === 'correction') {
-    const node = nodes.find((n) => n.key === 'correction')
-    if (node) node.status = extra?.correctionSubmitted ? 'done' : 'active'
-  }
-
-  // hide nodes that don't apply yet
-  if (status !== 'correction' && order.indexOf(status) < order.indexOf('correction')) {
-    const csIdx = nodes.findIndex((n) => n.key === 'correctionSubmitted')
-    const cIdx = nodes.findIndex((n) => n.key === 'correction')
-    if (csIdx >= 0) nodes.splice(csIdx, 1)
-    if (cIdx >= 0) nodes.splice(cIdx, 1)
-  } else if (order.indexOf(status) > order.indexOf('correction')) {
-    // already moved past correction: add correction nodes only if correction occurred (we detect via correctionOpinion presence)
-    // keep them but status stays as 'done' if they were done earlier
-  }
-  if (order.indexOf(status) < order.indexOf('approved')) {
-    const idx = nodes.findIndex((n) => n.key === 'approved')
-    if (idx >= 0) nodes.splice(idx, 1)
-  }
-  if (order.indexOf(status) < order.indexOf('paid')) {
-    const idx = nodes.findIndex((n) => n.key === 'paid')
-    if (idx >= 0) nodes.splice(idx, 1)
-  }
-  if (order.indexOf(status) < order.indexOf('completed')) {
-    const idx = nodes.findIndex((n) => n.key === 'completed')
-    if (idx >= 0) nodes.splice(idx, 1)
-  }
-
-  // Hide correctionSubmitted if correction never happened in first place
-  if (!extra?.correctionSubmitted) {
-    const idx = nodes.findIndex((n) => n.key === 'correctionSubmitted')
-    if (idx >= 0) nodes.splice(idx, 1)
-  }
-
-  return nodes
+  return baseNodes
 }
 
 export const declarations: Declaration[] = [

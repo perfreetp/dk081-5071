@@ -8,7 +8,8 @@ import { useDeclareStore } from '@/store/declare'
 import { useDeclarationsStore } from '@/store/declarations'
 import { useMessagesStore } from '@/store/messages'
 import { maskIdCard } from '@/utils/validator'
-import type { StepItem, Declaration, TimelineNode } from '@/types'
+import { buildTimeline } from '@/data/declarations'
+import type { StepItem, Declaration } from '@/types'
 import styles from './index.module.scss'
 
 const stepConfigs = [
@@ -137,12 +138,7 @@ const DeclarePage: React.FC = () => {
             const createTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
             const orderNo = `BDC${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
 
-            const timeline: TimelineNode[] = [
-              { key: 'submitted', title: '已提交申报', desc: '申报已成功提交，等待登记机构受理', time: createTime, status: 'done' },
-              { key: 'accepted', title: '已受理', desc: '登记机构已受理您的申报，正在排期审核', time: createTime, status: 'active' },
-              { key: 'reviewing', title: '材料审核中', desc: '工作人员正在审核您提交的全部材料', time: createTime, status: 'pending' },
-              { key: 'approved', title: '审核通过', desc: '材料审核通过，已生成税费信息', time: createTime, status: 'pending' }
-            ]
+            const timeline = buildTimeline('reviewing', createTime, createTime)
 
             const newDeclaration: Declaration = {
               id: `dec_${Date.now()}`,
