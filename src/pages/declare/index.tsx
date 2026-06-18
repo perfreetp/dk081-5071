@@ -5,8 +5,9 @@ import classnames from 'classnames'
 import PageContainer from '@/components/PageContainer'
 import StepIndicator from '@/components/StepIndicator'
 import { useDeclareStore } from '@/store/declare'
+import { useDeclarationsStore } from '@/store/declarations'
 import { maskIdCard, maskPhone } from '@/utils/validator'
-import type { StepItem } from '@/types'
+import type { StepItem, Declaration } from '@/types'
 import styles from './index.module.scss'
 
 const stepConfigs = [
@@ -32,6 +33,7 @@ const DeclarePage: React.FC = () => {
     appointment
   } = useDeclareStore()
 
+  const { addDeclaration } = useDeclarationsStore()
   const [stepStatus, setStepStatus] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
@@ -43,13 +45,15 @@ const DeclarePage: React.FC = () => {
   })
 
   const checkStepCompletion = () => {
+    const requiredMaterials = materials.filter(m => m.required)
+    const uploadedRequired = requiredMaterials.filter(m => m.uploaded).length
     const status: Record<string, boolean> = {
       office: !!selectedOffice,
       scenario: !!selectedScenario,
       decedent: !!decedent,
       heirs: heirs.length > 0,
-      property: !!property?.verified,
-      materials: materials.filter(m => m.required && m.uploaded).length === materials.filter(m => m.required).length && materials.length > 0,
+      property: !!property && !!property.address && !!property.area && !!property.usage && !!property.ownership,
+      materials: materials.length > 0 && uploadedRequired === requiredMaterials.length,
       signature: !!signature?.signatureUrl && signature?.promiseConfirmed,
       appointment: !!appointment?.date
     }
@@ -118,16 +122,43 @@ const DeclarePage: React.FC = () => {
         if (res.confirm) {
           Taro.showLoading({ title: '提交中...' })
           setTimeout(() => {
+            const now = new Date()
+            const pad = (n: number) => String(n).padStart(2, '0')
+            const createTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+            const orderNo = `BDC${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
+
+            const newDeclaration: Declaration = {
+              id: `dec_${Date.now()}`,
+              orderNo,
+              officeId: selectedOffice?.id || '',
+              officeName: selectedOffice?.name || '',
+              scenarioId: selectedScenario?.id || '',
+              scenarioName: selectedScenario?.name || '',
+              status: 'reviewing',
+              statusText: '审核中',
+              createTime,
+              updateTime: createTime,
+              decedent: decedent!,
+              heirs: heirs,
+              property: property!,
+              materials: materials,
+              signature: signature || undefined,
+              appointment: appointment || undefined
+            }
+
+            addDeclaration(newDeclaration)
+            console.log('[DeclarePage] 申报提交成功:', newDeclaration)
+
             Taro.hideLoading()
             Taro.showToast({
               title: '申报提交成功',
               icon: 'success',
-              duration: 2000
+              duration: 1500
             })
-            console.log('[DeclarePage] 申报提交成功')
             setTimeout(() => {
+              useDeclareStore.getState().reset()
               Taro.switchTab({ url: '/pages/progress/index' })
-            }, 2000)
+            }, 1500)
           }, 1500)
         }
       }
@@ -145,7 +176,10 @@ const DeclarePage: React.FC = () => {
       case 'heirs':
         return heirs.length > 0 ? `共 ${heirs.length} 位继承人` : '未添加'
       case 'property':
-        return property?.address || '未填写'
+        if (!property) return '未填写'
+        return property.verified
+          ? property.address
+          : `${property.address}（待人工核验）`
       case 'materials':
         return materials.length > 0
           ? `已上传 ${materials.filter(m => m.uploaded).length}/${materials.length} 项`

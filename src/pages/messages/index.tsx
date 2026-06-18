@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { View, Text, Button, ScrollView } from '@tarojs/components'
-import Taro, { useDidShow } from '@tarojs/taro'
+import Taro from '@tarojs/taro'
 import classnames from 'classnames'
 import PageContainer from '@/components/PageContainer'
 import MessageItem from '@/components/MessageItem'
 import EmptyState from '@/components/EmptyState'
-import { messages, getMessagesByType, getUnreadCount } from '@/data/messages'
-import type { Message } from '@/types'
+import { useMessagesStore } from '@/store/messages'
 import styles from './index.module.scss'
 
 const tabs = [
@@ -20,44 +19,43 @@ const tabs = [
 
 const MessagesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all')
-  const [list, setList] = useState<Message[]>([])
-  const [unreadCount, setUnreadCount] = useState(0)
+  const messages = useMessagesStore((s) => s.messages)
+  const markAllRead = useMessagesStore((s) => s.markAllRead)
+  const markRead = useMessagesStore((s) => s.markRead)
 
-  useEffect(() => {
-    loadData()
-  }, [activeTab])
+  const list = useMemo(() => {
+    if (activeTab === 'all') return messages
+    return messages.filter((m) => m.type === activeTab)
+  }, [messages, activeTab])
 
-  useDidShow(() => {
-    loadData()
-    setUnreadCount(getUnreadCount())
-  })
-
-  const loadData = () => {
-    const type = activeTab === 'all' ? undefined : activeTab as Message['type']
-    const data = getMessagesByType(type)
-    setList(data)
-    console.log('[MessagesPage] 加载消息:', data.length, '条')
-  }
+  const unreadCount = useMemo(
+    () => messages.filter((m) => !m.read).length,
+    [messages]
+  )
 
   const tabUnreadCounts = useMemo(() => {
     const counts: Record<string, number> = {}
-    tabs.forEach(tab => {
+    tabs.forEach((tab) => {
       if (tab.key === 'all') {
-        counts[tab.key] = getUnreadCount()
+        counts[tab.key] = unreadCount
       } else {
         counts[tab.key] = messages.filter(
-          m => m.type === tab.key && !m.read
+          (m) => m.type === tab.key && !m.read
         ).length
       }
     })
     return counts
-  }, [])
+  }, [messages, unreadCount])
 
   const handleTabChange = (key: string) => {
     setActiveTab(key)
   }
 
   const handleMessageClick = (id: string) => {
+    const msg = messages.find((m) => m.id === id)
+    if (msg && !msg.read) {
+      markRead(id)
+    }
     console.log('[MessagesPage] 点击消息:', id)
   }
 
@@ -76,7 +74,7 @@ const MessagesPage: React.FC = () => {
       content: '确定将所有消息标记为已读吗？',
       success: (res) => {
         if (res.confirm) {
-          setUnreadCount(0)
+          markAllRead()
           Taro.showToast({
             title: '已全部标记为已读',
             icon: 'success',
@@ -91,7 +89,16 @@ const MessagesPage: React.FC = () => {
   return (
     <PageContainer scroll padding>
       <View className={styles.header}>
-        <Text className={styles.title}>消息中心</Text>
+        <View className={styles.titleWrap}>
+          <Text className={styles.title}>消息中心</Text>
+          {unreadCount > 0 && (
+            <View className={styles.unreadDot}>
+              <Text className={styles.unreadDotText}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </Text>
+            </View>
+          )}
+        </View>
         <Button className={styles.readAllBtn} onClick={handleReadAll}>
           <Text className={styles.readAllText}>一键已读</Text>
         </Button>

@@ -30,12 +30,6 @@ const promiseText = `
 特此承诺！
 `
 
-const mockSignatures: Record<string, string> = {
-  '张三': 'https://img.icons8.com/color/96/hand-drawn.png',
-  '李四': 'https://img.icons8.com/color/96/signature.png',
-  '王五': 'https://img.icons8.com/color/96/pen.png'
-}
-
 const SignaturePage: React.FC = () => {
   const { signature, setSignature, heirs, decedent, property } = useDeclareStore()
   const [signatureUrl, setSignatureUrl] = useState<string>('')
@@ -49,25 +43,25 @@ const SignaturePage: React.FC = () => {
   const ctxRef = useRef<any>(null)
 
   useEffect(() => {
-    if (signature) {
-      setSignatureUrl(signature.signatureUrl)
-      setPromiseConfirmed(signature.promiseConfirmed)
-      setConfirmDate(signature.confirmDate)
-    }
-
     const initialHeirSignatures: Record<string, boolean> = {}
     heirs.forEach(heir => {
       initialHeirSignatures[heir.id] = false
     })
-    setHeirSignatures(initialHeirSignatures)
 
-    heirs.forEach(heir => {
-      if (mockSignatures[heir.name]) {
-        setTimeout(() => {
-          setHeirSignatures(prev => ({ ...prev, [heir.id]: true }))
-        }, 500)
+    if (signature) {
+      setSignatureUrl(signature.signatureUrl)
+      setPromiseConfirmed(signature.promiseConfirmed)
+      setConfirmDate(signature.confirmDate)
+      if (signature.heirConfirmations) {
+        heirs.forEach(heir => {
+          if (signature.heirConfirmations![heir.id] !== undefined) {
+            initialHeirSignatures[heir.id] = signature.heirConfirmations![heir.id]
+          }
+        })
       }
-    })
+    }
+
+    setHeirSignatures(initialHeirSignatures)
   }, [])
 
   const handleSign = () => {
@@ -180,17 +174,23 @@ const SignaturePage: React.FC = () => {
     })
   }
 
-  const handleUseMockSignature = () => {
-    Taro.showActionSheet({
-      itemList: ['生成示例签名1', '生成示例签名2', '生成示例签名3'],
-      success: (res) => {
-        const signatures = Object.values(mockSignatures)
-        const sig = signatures[res.tapIndex]
-        setSignatureUrl(sig)
-        setConfirmDate(new Date().toLocaleDateString('zh-CN'))
-        Taro.showToast({ title: '签名已生成', icon: 'success' })
-      }
-    })
+  const handleConfirmHeir = (heir: HeirInfo) => {
+    const isConfirmed = !!heirSignatures[heir.id]
+    if (isConfirmed) {
+      setHeirSignatures(prev => ({ ...prev, [heir.id]: false }))
+      Taro.showToast({ title: '已取消确认', icon: 'none' })
+      return
+    }
+    if (!signatureUrl) {
+      Taro.showToast({ title: '请主继承人先完成签名', icon: 'none' })
+      return
+    }
+    if (!promiseConfirmed) {
+      Taro.showToast({ title: '请先确认承诺书', icon: 'none' })
+      return
+    }
+    setHeirSignatures(prev => ({ ...prev, [heir.id]: true }))
+    Taro.showToast({ title: `${heir.name} 已确认`, icon: 'success' })
   }
 
   const handleToggleConfirm = () => {
@@ -225,7 +225,8 @@ const SignaturePage: React.FC = () => {
     const signatureInfo: SignatureInfo = {
       signatureUrl,
       promiseConfirmed,
-      confirmDate
+      confirmDate,
+      heirConfirmations: { ...heirSignatures }
     }
     setSignature(signatureInfo)
     console.log('[SignaturePage] 保存签名确认信息:', signatureInfo)
@@ -284,22 +285,13 @@ const SignaturePage: React.FC = () => {
         </View>
         <View className={styles.signatureActions}>
           {!signatureUrl ? (
-            <>
-              <Button
-                className={`${styles.actionBtn} ${styles.primaryBtn}`}
-                onClick={handleSign}
-              >
-                <Text className={styles.btnIcon}>✍️</Text>
-                <Text>手写签名</Text>
-              </Button>
-              <Button
-                className={`${styles.actionBtn} ${styles.secondaryBtn}`}
-                onClick={handleUseMockSignature}
-              >
-                <Text className={styles.btnIcon}>🎨</Text>
-                <Text>示例签名</Text>
-              </Button>
-            </>
+            <Button
+              className={`${styles.actionBtn} ${styles.primaryBtn}`}
+              onClick={handleSign}
+            >
+              <Text className={styles.btnIcon}>✍️</Text>
+              <Text>手写签名</Text>
+            </Button>
           ) : (
             <Button
               className={`${styles.actionBtn} ${styles.dangerBtn}`}
@@ -319,33 +311,45 @@ const SignaturePage: React.FC = () => {
             继承人共同确认
           </Text>
           <View className={styles.heirsList}>
-            {heirs.map((heir: HeirInfo) => (
-              <View key={heir.id} className={styles.heirItem}>
-                <View className={styles.heirInfo}>
-                  <Text className={styles.heirName}>
-                    {heir.name}
-                    {heir.isMain && <Text className={styles.heirMain}>主继承人</Text>}
-                  </Text>
-                  <Text className={styles.heirRelation}>
-                    {heir.relationship} · {maskIdCard(heir.idCard)}
-                  </Text>
+            {heirs.map((heir: HeirInfo) => {
+              const confirmed = !!heirSignatures[heir.id]
+              return (
+                <View
+                  key={heir.id}
+                  className={`${styles.heirItem} ${confirmed ? styles.heirConfirmed : ''}`}
+                  onClick={() => handleConfirmHeir(heir)}
+                >
+                  <View className={styles.heirInfo}>
+                    <Text className={styles.heirName}>
+                      {heir.name || '未填写'}
+                      {heir.isMain && <Text className={styles.heirMain}>主继承人</Text>}
+                    </Text>
+                    <Text className={styles.heirRelation}>
+                      {heir.relationship} · {maskIdCard(heir.idCard)}
+                    </Text>
+                  </View>
+                  <View className={styles.confirmStatus}>
+                    {confirmed ? (
+                      <>
+                        <Text className={styles.statusIcon}>✅</Text>
+                        <Text className={`${styles.statusText} ${styles.confirmed}`}>已确认</Text>
+                      </>
+                    ) : (
+                      <>
+                        <Text className={styles.statusIcon}>👆</Text>
+                        <Text className={`${styles.statusText} ${styles.pending}`}>点击确认</Text>
+                      </>
+                    )}
+                  </View>
                 </View>
-                <View className={styles.confirmStatus}>
-                  {heirSignatures[heir.id] ? (
-                    <>
-                      <Text className={styles.statusIcon}>✅</Text>
-                      <Text className={`${styles.statusText} ${styles.confirmed}`}>已确认</Text>
-                    </>
-                  ) : (
-                    <>
-                      <Text className={styles.statusIcon}>⏳</Text>
-                      <Text className={`${styles.statusText} ${styles.pending}`}>待确认</Text>
-                    </>
-                  )}
-                </View>
-              </View>
-            ))}
+              )
+            })}
           </View>
+          {!allHeirsConfirmed && (
+            <Text className={styles.confirmTip}>
+              请各位继承人逐个点击确认（{Object.values(heirSignatures).filter(Boolean).length}/{heirs.length}）
+            </Text>
+          )}
         </View>
       )}
 

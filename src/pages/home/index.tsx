@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import { View, Text, Button, ScrollView } from '@tarojs/components'
 import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro'
 import PageContainer from '@/components/PageContainer'
-import { messages, getUnreadCount } from '@/data/messages'
+import { useMessagesStore } from '@/store/messages'
 import styles from './index.module.scss'
 
 const quickEntries = [
@@ -25,30 +25,30 @@ const processSteps = [
 
 const HomePage: React.FC = () => {
   const [location, setLocation] = useState('北京市海淀区')
-  const [unreadCount, setUnreadCount] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
+  const messages = useMessagesStore((s) => s.messages)
 
-  useEffect(() => {
-    loadData()
-  }, [])
+  const unreadCount = useMemo(
+    () => messages.filter((m) => !m.read).length,
+    [messages]
+  )
+
+  const notices = useMemo(
+    () => messages.filter((m) => m.type === 'notice').slice(0, 3),
+    [messages]
+  )
 
   useDidShow(() => {
-    setUnreadCount(getUnreadCount())
+    console.log('[HomePage] 加载首页数据')
   })
 
   usePullDownRefresh(() => {
     setRefreshing(true)
     setTimeout(() => {
-      loadData()
       setRefreshing(false)
       Taro.stopPullDownRefresh()
     }, 1000)
   })
-
-  const loadData = () => {
-    setUnreadCount(getUnreadCount())
-    console.log('[HomePage] 加载首页数据')
-  }
 
   const handleStart = () => {
     Taro.navigateTo({ url: '/pages/select-office/index' })
@@ -174,7 +174,7 @@ const HomePage: React.FC = () => {
           </View>
         </View>
         <ScrollView scrollX className={styles.noticeScroll} enhanced showScrollbar={false}>
-          {messages.filter(m => m.type === 'notice').slice(0, 3).map((notice) => (
+          {notices.map((notice) => (
             <View key={notice.id} className={styles.noticeItem} onClick={handleNoticeClick}>
               <View className={styles.noticeHeader}>
                 <View className={styles.noticeTag}>

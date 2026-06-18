@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import PageContainer from '@/components/PageContainer'
-import { getDeclarationById } from '@/data/declarations'
+import { useDeclarationsStore } from '@/store/declarations'
 import { maskIdCard, maskPhone } from '@/utils/validator'
 import type { Declaration } from '@/types'
 import styles from './index.module.scss'
@@ -18,19 +18,20 @@ const statusSteps = [
 
 const DetailPage: React.FC = () => {
   const [declaration, setDeclaration] = useState<Declaration | null>(null)
+  const declarations = useDeclarationsStore((s) => s.declarations)
 
   useEffect(() => {
     const pages = Taro.getCurrentPages()
     const currentPage = pages[pages.length - 1]
     const id = (currentPage as any).options?.id || 'dec_001'
 
-    const dec = getDeclarationById(id)
+    const dec = declarations.find((d) => d.id === id)
     if (dec) {
       setDeclaration(dec)
     } else {
       Taro.showToast({ title: '申报记录不存在', icon: 'none' })
     }
-  }, [])
+  }, [declarations])
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {

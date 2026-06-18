@@ -1,6 +1,7 @@
 export interface Region {
   code: string
   name: string
+  municipality?: boolean
   children?: Region[]
 }
 
@@ -55,12 +56,14 @@ export interface PropertyInfo {
   usage: string
   ownership: string
   verified: boolean
+  pendingManualVerify?: boolean
 }
 
 export interface SignatureInfo {
   signatureUrl: string
   promiseConfirmed: boolean
   confirmDate: string
+  heirConfirmations?: Record<string, boolean>
 }
 
 export interface AppointmentInfo {

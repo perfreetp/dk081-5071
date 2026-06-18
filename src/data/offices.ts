@@ -4,6 +4,7 @@ export const regions: Region[] = [
   {
     code: '110000',
     name: '北京市',
+    municipality: true,
     children: [
       { code: '110101', name: '东城区' },
       { code: '110102', name: '西城区' },
@@ -26,6 +27,7 @@ export const regions: Region[] = [
   {
     code: '310000',
     name: '上海市',
+    municipality: true,
     children: [
       { code: '310101', name: '黄浦区' },
       { code: '310104', name: '徐汇区' },
@@ -49,8 +51,24 @@ export const regions: Region[] = [
     code: '440000',
     name: '广东省',
     children: [
-      { code: '440100', name: '广州市' },
-      { code: '440300', name: '深圳市' },
+      {
+        code: '440100',
+        name: '广州市',
+        children: [
+          { code: '440104', name: '越秀区' },
+          { code: '440106', name: '天河区' },
+          { code: '440111', name: '白云区' }
+        ]
+      },
+      {
+        code: '440300',
+        name: '深圳市',
+        children: [
+          { code: '440304', name: '福田区' },
+          { code: '440305', name: '南山区' },
+          { code: '440306', name: '宝安区' }
+        ]
+      },
       { code: '440400', name: '珠海市' },
       { code: '440600', name: '佛山市' },
       { code: '441900', name: '东莞市' }
@@ -134,9 +152,19 @@ export const offices: Office[] = [
 ]
 
 export function getOfficesByRegion(regionCode: string): Office[] {
-  return offices.filter(office => office.regionCode.startsWith(regionCode))
+  let prefix = regionCode
+  if (regionCode.endsWith('0000')) {
+    prefix = regionCode.substring(0, 2)
+  } else if (regionCode.endsWith('00')) {
+    prefix = regionCode.substring(0, 4)
+  }
+  return offices.filter(office => office.regionCode.startsWith(prefix))
 }
 
 export function getOfficeById(id: string): Office | undefined {
   return offices.find(office => office.id === id)
+}
+
+export function isMunicipality(region?: Region | null): boolean {
+  return !!region?.municipality
 }

@@ -162,6 +162,14 @@
   gap: $spacing-md;
 }
 
+.confirmTip {
+  display: block;
+  margin-top: $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  text-align: center;
+}
+
 .heirItem {
   display: flex;
   align-items: center;
@@ -169,6 +177,13 @@
   padding: $spacing-md;
   background: $color-bg-section;
   border-radius: $radius-md;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &.heirConfirmed {
+    background: rgba(0, 180, 42, 0.06);
+    border-color: rgba(0, 180, 42, 0.3);
+  }
 
   .heirInfo {
     flex: 1;

@@ -13,6 +13,29 @@
   color: $color-text-primary;
 }
 
+.titleWrap {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.unreadDot {
+  min-width: 36rpx;
+  height: 36rpx;
+  padding: 0 $spacing-xs;
+  border-radius: 18rpx;
+  background: $color-error;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.unreadDotText {
+  font-size: $font-size-xs;
+  color: #ffffff;
+  line-height: 1;
+}
+
 .readAllBtn {
   @include button-reset;
   height: 60rpx;

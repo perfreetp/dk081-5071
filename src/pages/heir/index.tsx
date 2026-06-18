@@ -36,15 +36,16 @@ const HeirPage: React.FC = () => {
   }
 
   const handleInput = (index: number, field: keyof HeirInfo, value: string | boolean) => {
-    setForms(prev => prev.map((form, i) => {
-      if (i === index) {
-        if (field === 'isMain' && value === true) {
-          return prev.map(f => ({ ...f, isMain: f.id === form.id }))
-        }
-        return { ...form, [field]: value }
+    setForms(prev => {
+      if (field === 'isMain' && value === true) {
+        const targetId = prev[index].id
+        return prev.map(f => ({ ...f, isMain: f.id === targetId }))
       }
-      return form
-    }))
+      if (field === 'isMain' && value === false) {
+        return prev.map((form, i) => (i === index ? { ...form, isMain: false } : form))
+      }
+      return prev.map((form, i) => (i === index ? { ...form, [field]: value } : form))
+    })
   }
 
   const handleRelationshipSelect = (index: number) => {

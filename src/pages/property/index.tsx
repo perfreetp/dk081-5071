@@ -61,6 +61,7 @@ const PropertyPage: React.FC = () => {
     setForm(prev => ({ ...prev, [field]: value }))
     if (field === 'certNumber') {
       setShowVerified(false)
+      setForm(prev => ({ ...prev, verified: false, pendingManualVerify: false }))
     }
   }
 
@@ -99,15 +100,21 @@ const PropertyPage: React.FC = () => {
 
     const mockData = mockPropertyData[form.certNumber]
     if (mockData) {
-      setForm({ ...mockData, verified: true })
+      setForm({ ...mockData, verified: true, pendingManualVerify: false })
       setShowVerified(true)
       Taro.showToast({ title: '信息校验通过', icon: 'success' })
     } else {
       Taro.showModal({
         title: '未查询到信息',
-        content: '未在系统中查询到该证号信息，请核对后重新输入，或手动填写不动产信息。',
+        content: '未在系统中查询到该证号信息。您可手动填写不动产信息后继续申报，该信息将在原件核验环节进行人工核验。',
         confirmText: '手动填写',
-        cancelText: '重新输入'
+        cancelText: '重新输入',
+        success: (res) => {
+          if (res.confirm) {
+            setForm(prev => ({ ...prev, verified: false, pendingManualVerify: true }))
+            Taro.showToast({ title: '请补充填写不动产信息', icon: 'none' })
+          }
+        }
       })
     }
 
@@ -152,10 +159,15 @@ const PropertyPage: React.FC = () => {
   const handleSave = () => {
     if (!validateForm()) return
 
-    setProperty(form)
-    console.log('[PropertyPage] 保存不动产信息:', form)
+    const dataToSave: PropertyInfo = {
+      ...form,
+      verified: form.verified,
+      pendingManualVerify: !form.verified ? true : !!form.pendingManualVerify
+    }
+    setProperty(dataToSave)
+    console.log('[PropertyPage] 保存不动产信息:', dataToSave)
     Taro.showToast({
-      title: '信息已保存',
+      title: form.verified ? '信息已保存' : '已保存（待人工核验）',
       icon: 'success',
       duration: 1500
     })
@@ -247,6 +259,27 @@ const PropertyPage: React.FC = () => {
                 <Text className={styles.infoValue}>{form.ownership}</Text>
               </View>
             </View>
+          </View>
+        )}
+
+        {form.pendingManualVerify && !showVerified && (
+          <View
+            className={styles.infoDisplay}
+            style={{ background: 'rgba(255, 125, 0, 0.08)' }}
+          >
+            <View className={styles.infoHeader}>
+              <Text className={styles.infoIcon}>⏳</Text>
+              <Text className={styles.infoTitle}>待人工核验</Text>
+              <Text
+                className={styles.infoStatus}
+                style={{ color: '#FF7D00', background: '#FFF3E8' }}
+              >
+                待核验
+              </Text>
+            </View>
+            <Text style={{ fontSize: '24rpx', color: '#4e5969', lineHeight: 1.6 }}>
+              该证号未在系统中查询到，请补充填写下方不动产信息。信息将在原件核验环节由工作人员人工核验，不影响您继续申报。
+            </Text>
           </View>
         )}
       </View>

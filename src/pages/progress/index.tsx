@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import PageContainer from '@/components/PageContainer'
 import ProgressCard from '@/components/ProgressCard'
 import EmptyState from '@/components/EmptyState'
-import { declarations, getDeclarationsByStatus } from '@/data/declarations'
+import { useDeclarationsStore } from '@/store/declarations'
 import type { Declaration } from '@/types'
 import styles from './index.module.scss'
 
@@ -20,7 +20,7 @@ const tabs = [
 const ProgressPage: React.FC = () => {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('all')
-  const [list, setList] = useState<Declaration[]>([])
+  const declarations = useDeclarationsStore((s) => s.declarations)
 
   useEffect(() => {
     const tabParam = router.params.tab
@@ -30,30 +30,27 @@ const ProgressPage: React.FC = () => {
   }, [])
 
   useDidShow(() => {
-    loadData()
+    console.log('[ProgressPage] 进入进度中心，当前申报数:', declarations.length)
   })
 
-  const loadData = () => {
-    let data: Declaration[]
-    if (activeTab === 'all') {
-      data = declarations
-    } else {
-      data = getDeclarationsByStatus(activeTab as Declaration['status'])
-    }
-    setList(data)
-    console.log('[ProgressPage] 加载列表:', data.length, '条')
-  }
+  const list = useMemo(() => {
+    if (activeTab === 'all') return declarations
+    return declarations.filter((d) => d.status === activeTab)
+  }, [activeTab, declarations])
 
-  useEffect(() => {
-    loadData()
-  }, [activeTab])
-
-  const stats = useMemo(() => ({
-    total: declarations.length,
-    reviewing: declarations.filter(d => d.status === 'reviewing' || d.status === 'submitted').length,
-    correction: declarations.filter(d => d.status === 'correction').length,
-    completed: declarations.filter(d => d.status === 'completed' || d.status === 'paid').length
-  }), [])
+  const stats = useMemo(
+    () => ({
+      total: declarations.length,
+      reviewing: declarations.filter(
+        (d) => d.status === 'reviewing' || d.status === 'submitted'
+      ).length,
+      correction: declarations.filter((d) => d.status === 'correction').length,
+      completed: declarations.filter(
+        (d) => d.status === 'completed' || d.status === 'paid'
+      ).length
+    }),
+    [declarations]
+  )
 
   const handleTabChange = (key: string) => {
     setActiveTab(key)
