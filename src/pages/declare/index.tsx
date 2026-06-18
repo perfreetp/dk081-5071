@@ -6,8 +6,9 @@ import PageContainer from '@/components/PageContainer'
 import StepIndicator from '@/components/StepIndicator'
 import { useDeclareStore } from '@/store/declare'
 import { useDeclarationsStore } from '@/store/declarations'
-import { maskIdCard, maskPhone } from '@/utils/validator'
-import type { StepItem, Declaration } from '@/types'
+import { useMessagesStore } from '@/store/messages'
+import { maskIdCard } from '@/utils/validator'
+import type { StepItem, Declaration, TimelineNode } from '@/types'
 import styles from './index.module.scss'
 
 const stepConfigs = [
@@ -34,6 +35,7 @@ const DeclarePage: React.FC = () => {
   } = useDeclareStore()
 
   const { addDeclaration } = useDeclarationsStore()
+  const { addMessage } = useMessagesStore()
   const [stepStatus, setStepStatus] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
@@ -47,6 +49,14 @@ const DeclarePage: React.FC = () => {
   const checkStepCompletion = () => {
     const requiredMaterials = materials.filter(m => m.required)
     const uploadedRequired = requiredMaterials.filter(m => m.uploaded).length
+    const heirIds = heirs.map(h => h.id)
+    const confirmations = signature?.heirConfirmations || {}
+    const allHeirsConfirmed = heirIds.every(id => confirmations[id] === true)
+    const signatureCompleted =
+      !!signature?.signatureUrl &&
+      signature?.promiseConfirmed === true &&
+      allHeirsConfirmed
+
     const status: Record<string, boolean> = {
       office: !!selectedOffice,
       scenario: !!selectedScenario,
@@ -54,11 +64,11 @@ const DeclarePage: React.FC = () => {
       heirs: heirs.length > 0,
       property: !!property && !!property.address && !!property.area && !!property.usage && !!property.ownership,
       materials: materials.length > 0 && uploadedRequired === requiredMaterials.length,
-      signature: !!signature?.signatureUrl && signature?.promiseConfirmed,
+      signature: signatureCompleted,
       appointment: !!appointment?.date
     }
     setStepStatus(status)
-    console.log('[DeclarePage] 步骤完成状态:', status)
+    console.log('[DeclarePage] 步骤完成状态:', status, '继承人确认:', allHeirsConfirmed)
   }
 
   const steps: StepItem[] = useMemo(() => {
@@ -127,6 +137,13 @@ const DeclarePage: React.FC = () => {
             const createTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
             const orderNo = `BDC${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
 
+            const timeline: TimelineNode[] = [
+              { key: 'submitted', title: '已提交申报', desc: '申报已成功提交，等待登记机构受理', time: createTime, status: 'done' },
+              { key: 'accepted', title: '已受理', desc: '登记机构已受理您的申报，正在排期审核', time: createTime, status: 'active' },
+              { key: 'reviewing', title: '材料审核中', desc: '工作人员正在审核您提交的全部材料', time: createTime, status: 'pending' },
+              { key: 'approved', title: '审核通过', desc: '材料审核通过，已生成税费信息', time: createTime, status: 'pending' }
+            ]
+
             const newDeclaration: Declaration = {
               id: `dec_${Date.now()}`,
               orderNo,
@@ -143,10 +160,20 @@ const DeclarePage: React.FC = () => {
               property: property!,
               materials: materials,
               signature: signature || undefined,
-              appointment: appointment || undefined
+              appointment: appointment || undefined,
+              timeline
             }
 
             addDeclaration(newDeclaration)
+
+            const mainHeir = heirs.find(h => h.isMain) || heirs[0]
+            addMessage({
+              type: 'acceptance',
+              title: '【受理通知】您的申报已成功受理',
+              content: `申报编号：${orderNo}\n登记机构：${selectedOffice?.name}\n申请人：${mainHeir?.name || ''}\n当前状态：审核中\n\n您的申报已进入审核流程，通常3-5个工作日内完成审核。如有需要补充的材料，我们会通过消息第一时间通知您，请留意消息中心。`,
+              relatedId: newDeclaration.id
+            })
+
             console.log('[DeclarePage] 申报提交成功:', newDeclaration)
 
             Taro.hideLoading()

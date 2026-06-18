@@ -31,7 +31,7 @@ const promiseText = `
 `
 
 const SignaturePage: React.FC = () => {
-  const { signature, setSignature, heirs, decedent, property } = useDeclareStore()
+  const { signature, setSignature, heirs } = useDeclareStore()
   const [signatureUrl, setSignatureUrl] = useState<string>('')
   const [promiseConfirmed, setPromiseConfirmed] = useState(false)
   const [showSignaturePad, setShowSignaturePad] = useState(false)
@@ -63,6 +63,23 @@ const SignaturePage: React.FC = () => {
 
     setHeirSignatures(initialHeirSignatures)
   }, [])
+
+  useEffect(() => {
+    // 继承人名单变化时，按最新名单同步确认状态：已存在的保留，新增的默认未确认，删除的清除
+    setHeirSignatures(prev => {
+      const next: Record<string, boolean> = {}
+      heirs.forEach(heir => {
+        next[heir.id] = prev[heir.id] === true
+      })
+      let changed = false
+      const keys = Object.keys(next)
+      if (keys.length !== Object.keys(prev).length) changed = true
+      else for (const k of keys) {
+        if (prev[k] !== next[k]) { changed = true; break }
+      }
+      return changed ? next : prev
+    })
+  }, [heirs])
 
   const handleSign = () => {
     setShowSignaturePad(true)

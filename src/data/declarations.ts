@@ -1,4 +1,84 @@
-import type { Declaration } from '@/types'
+import type { Declaration, TimelineNode } from '@/types'
+
+function buildTimeline(
+  status: Declaration['status'],
+  createTime: string,
+  updateTime: string,
+  extra?: {
+    correctionSubmitted?: boolean
+    correctionSubmitTime?: string
+    correctionTime?: string
+    paidTime?: string
+  }
+): TimelineNode[] {
+  const nodes: TimelineNode[] = [
+    { key: 'submitted', title: '已提交申报', desc: '申报已成功提交，等待登记机构受理', time: createTime, status: 'done' },
+    { key: 'accepted', title: '已受理', desc: '登记机构已受理您的申报，正在排期审核', time: createTime, status: status === 'submitted' ? 'pending' : 'done' },
+    { key: 'reviewing', title: '材料审核中', desc: '工作人员正在审核您提交的全部材料', time: updateTime, status: 'pending' },
+    { key: 'correction', title: '待补正材料', desc: '请按意见补充或修正材料后重新提交', time: extra?.correctionTime || updateTime, status: 'pending' },
+    { key: 'correctionSubmitted', title: '补正材料已提交', desc: '补正材料已重新提交，等待复审', time: extra?.correctionSubmitTime || updateTime, status: 'pending' },
+    { key: 'approved', title: '审核通过', desc: '材料审核通过，已生成税费信息', time: updateTime, status: 'pending' },
+    { key: 'paid', title: '待取证/邮寄', desc: '税费已缴纳，等待证件制作与发放', time: extra?.paidTime || updateTime, status: 'pending' },
+    { key: 'completed', title: '登记完成', desc: '登记已完成，证件已制作发放', time: updateTime, status: 'pending' }
+  ]
+
+  const order: Declaration['status'][] = ['submitted', 'reviewing', 'correction', 'approved', 'paid', 'completed']
+  const curIdx = order.indexOf(status)
+
+  nodes.forEach((n) => {
+    if (n.key === 'accepted') {
+      n.status = status === 'submitted' ? 'active' : 'done'
+      return
+    }
+    if (n.key === 'correctionSubmitted') {
+      if (extra?.correctionSubmitted) {
+        n.status = 'done'
+      }
+      return
+    }
+    const idx = order.indexOf(n.key as Declaration['status'])
+    if (idx === -1) return
+    if (idx < curIdx) n.status = 'done'
+    else if (idx === curIdx) n.status = 'active'
+    else n.status = 'pending'
+  })
+
+  if (status === 'correction') {
+    const node = nodes.find((n) => n.key === 'correction')
+    if (node) node.status = extra?.correctionSubmitted ? 'done' : 'active'
+  }
+
+  // hide nodes that don't apply yet
+  if (status !== 'correction' && order.indexOf(status) < order.indexOf('correction')) {
+    const csIdx = nodes.findIndex((n) => n.key === 'correctionSubmitted')
+    const cIdx = nodes.findIndex((n) => n.key === 'correction')
+    if (csIdx >= 0) nodes.splice(csIdx, 1)
+    if (cIdx >= 0) nodes.splice(cIdx, 1)
+  } else if (order.indexOf(status) > order.indexOf('correction')) {
+    // already moved past correction: add correction nodes only if correction occurred (we detect via correctionOpinion presence)
+    // keep them but status stays as 'done' if they were done earlier
+  }
+  if (order.indexOf(status) < order.indexOf('approved')) {
+    const idx = nodes.findIndex((n) => n.key === 'approved')
+    if (idx >= 0) nodes.splice(idx, 1)
+  }
+  if (order.indexOf(status) < order.indexOf('paid')) {
+    const idx = nodes.findIndex((n) => n.key === 'paid')
+    if (idx >= 0) nodes.splice(idx, 1)
+  }
+  if (order.indexOf(status) < order.indexOf('completed')) {
+    const idx = nodes.findIndex((n) => n.key === 'completed')
+    if (idx >= 0) nodes.splice(idx, 1)
+  }
+
+  // Hide correctionSubmitted if correction never happened in first place
+  if (!extra?.correctionSubmitted) {
+    const idx = nodes.findIndex((n) => n.key === 'correctionSubmitted')
+    if (idx >= 0) nodes.splice(idx, 1)
+  }
+
+  return nodes
+}
 
 export const declarations: Declaration[] = [
   {
@@ -67,7 +147,8 @@ export const declarations: Declaration[] = [
     signature: {
       signatureUrl: 'signature_001.png',
       promiseConfirmed: true,
-      confirmDate: '2024-01-15'
+      confirmDate: '2024-01-15',
+      heirConfirmations: { heir_001: true, heir_002: true, heir_003: true }
     },
     appointment: {
       type: 'onsite',
@@ -76,7 +157,8 @@ export const declarations: Declaration[] = [
       address: '北京市海淀区东北旺南路27号上地办公中心',
       contact: '李四',
       contactPhone: '13800138001'
-    }
+    },
+    timeline: buildTimeline('reviewing', '2024-01-15 10:30:00', '2024-01-16 14:20:00')
   },
   {
     id: 'dec_002',
@@ -123,7 +205,9 @@ export const declarations: Declaration[] = [
       { id: 'property_cert', name: '不动产权属证书', required: true, description: '不动产权证书', uploaded: true },
       { id: 'marriage_proof', name: '婚姻状况证明', required: true, description: '死亡证明', uploaded: true }
     ],
-    correctionOpinion: '请补充提交公证遗嘱原件的扫描件，需要清晰可见公证处公章和公证员签名。'
+    correctionOpinion: '请补充提交公证遗嘱原件的扫描件，需要清晰可见公证处公章和公证员签名。',
+    correctionMaterials: ['will'],
+    timeline: buildTimeline('correction', '2024-01-10 15:20:00', '2024-01-14 09:30:00', { correctionTime: '2024-01-14 09:30:00' })
   },
   {
     id: 'dec_003',
@@ -183,7 +267,8 @@ export const declarations: Declaration[] = [
       type: 'self',
       date: '2024-01-20',
       address: '上海市浦东新区张杨路2899号'
-    }
+    },
+    timeline: buildTimeline('paid', '2024-01-05 11:00:00', '2024-01-12 16:45:00', { paidTime: '2024-01-12 16:45:00' })
   },
   {
     id: 'dec_004',
@@ -245,7 +330,8 @@ export const declarations: Declaration[] = [
       receiverPhone: '13400134006',
       address: '深圳市南山区科技园路100号12号楼4单元404室',
       trackingNo: 'SF1234567890'
-    }
+    },
+    timeline: buildTimeline('completed', '2024-01-01 09:30:00', '2024-01-10 10:00:00')
   }
 ]
 

@@ -1,24 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { View, Text, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import PageContainer from '@/components/PageContainer'
 import { useDeclarationsStore } from '@/store/declarations'
 import { maskIdCard, maskPhone } from '@/utils/validator'
-import type { Declaration } from '@/types'
+import type { Declaration, TimelineNode } from '@/types'
 import styles from './index.module.scss'
-
-const statusSteps = [
-  { key: 'submitted', title: '提交申报', desc: '您的申报已成功提交' },
-  { key: 'reviewing', title: '材料审核', desc: '工作人员正在审核您的材料' },
-  { key: 'correction', title: '待补正', desc: '请按要求补充或修正材料' },
-  { key: 'approved', title: '审核通过', desc: '材料审核通过，请预约核验' },
-  { key: 'paid', title: '税费缴纳', desc: '已完成税费缴纳' },
-  { key: 'completed', title: '已完成', desc: '登记完成，证件已制作' }
-]
 
 const DetailPage: React.FC = () => {
   const [declaration, setDeclaration] = useState<Declaration | null>(null)
   const declarations = useDeclarationsStore((s) => s.declarations)
+  const updateDeclaration = useDeclarationsStore((s) => s.updateDeclaration)
 
   useEffect(() => {
     const pages = Taro.getCurrentPages()
@@ -32,6 +24,55 @@ const DetailPage: React.FC = () => {
       Taro.showToast({ title: '申报记录不存在', icon: 'none' })
     }
   }, [declarations])
+
+  const timeline = useMemo<TimelineNode[]>(() => {
+    if (!declaration) return []
+    if (declaration.timeline && declaration.timeline.length > 0) {
+      return declaration.timeline
+    }
+    // fallback to legacy statusSteps
+    const defaultNodes: TimelineNode[] = []
+    const order: Declaration['status'][] = ['submitted', 'reviewing', 'correction', 'approved', 'paid', 'completed']
+    const labels: Record<string, { title: string; desc: string }> = {
+      submitted: { title: '已提交申报', desc: '申报已成功提交' },
+      accepted: { title: '已受理', desc: '登记机构已受理' },
+      reviewing: { title: '材料审核中', desc: '工作人员正在审核您的材料' },
+      correction: { title: '待补正材料', desc: '请按要求补充或修正材料' },
+      approved: { title: '审核通过', desc: '材料审核通过' },
+      paid: { title: '待取证/邮寄', desc: '税费已缴纳' },
+      completed: { title: '登记完成', desc: '证件已制作发放' }
+    }
+    const curIdx = order.indexOf(declaration.status)
+    order.forEach((s, idx) => {
+      if (idx === 0 && curIdx >= 0) {
+        defaultNodes.push({
+          key: 'submitted',
+          title: labels.submitted.title,
+          desc: labels.submitted.desc,
+          time: declaration.createTime,
+          status: curIdx >= 0 ? 'done' : 'pending'
+        })
+        defaultNodes.push({
+          key: 'accepted',
+          title: labels.accepted.title,
+          desc: labels.accepted.desc,
+          time: declaration.createTime,
+          status: curIdx >= 1 ? 'done' : 'active'
+        })
+      }
+      if (idx === 0) return
+      const label = labels[s] || { title: s, desc: '' }
+      if (idx > curIdx + 2) return
+      defaultNodes.push({
+        key: s,
+        title: label.title,
+        desc: label.desc,
+        time: declaration.updateTime,
+        status: idx < curIdx ? 'done' : idx === curIdx ? 'active' : 'pending'
+      })
+    })
+    return defaultNodes
+  }, [declaration])
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -47,22 +88,74 @@ const DetailPage: React.FC = () => {
     return colors[status] || '#86909c'
   }
 
-  const getStepStatus = (stepKey: string, currentStatus: string) => {
-    const stepIndex = statusSteps.findIndex(s => s.key === stepKey)
-    const currentIndex = statusSteps.findIndex(s => s.key === currentStatus)
-
-    if (stepIndex < currentIndex || currentStatus === 'completed') return 'done'
-    if (stepIndex === currentIndex) return 'active'
-    return 'pending'
-  }
+  const correctionMaterials = useMemo(() => {
+    if (!declaration?.correctionMaterials) return []
+    return declaration.materials.filter((m) =>
+      declaration.correctionMaterials!.includes(m.id)
+    )
+  }, [declaration])
 
   const handleCorrection = () => {
+    if (!declaration) return
     Taro.showModal({
       title: '补正材料',
-      content: '是否前往材料上传页面补充缺失的材料？',
+      content: `共需补正 ${correctionMaterials.length} 份材料，确认前往上传页面补传？`,
       success: (res) => {
         if (res.confirm) {
-          Taro.navigateTo({ url: '/pages/upload/index' })
+          Taro.navigateTo({ url: '/pages/upload/index?correction=1' })
+        }
+      }
+    })
+  }
+
+  const handleSubmitCorrection = () => {
+    if (!declaration) return
+    // check required correction materials uploaded
+    const allUploaded = correctionMaterials.every((m) => m.uploaded)
+    if (!allUploaded) {
+      Taro.showToast({ title: '请先完成全部补正材料上传', icon: 'none' })
+      return
+    }
+    Taro.showModal({
+      title: '提交补正材料',
+      content: '确认提交您补正的材料？提交后将重新进入审核流程。',
+      success: (res) => {
+        if (res.confirm && declaration) {
+          const now = new Date()
+          const pad = (n: number) => String(n).padStart(2, '0')
+          const submitTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+
+          const newTimeline: TimelineNode[] = [
+            ...(declaration.timeline || []).map((n) => {
+              if (n.key === 'correction') return { ...n, status: 'done' as const }
+              return n
+            }),
+            {
+              key: 'correctionSubmitted',
+              title: '补正材料已提交',
+              desc: '补正材料已重新提交，等待复审',
+              time: submitTime,
+              status: 'active'
+            },
+            {
+              key: 'reviewing',
+              title: '材料复审中',
+              desc: '工作人员正在复审您补正后的材料',
+              time: submitTime,
+              status: 'pending'
+            }
+          ]
+
+          updateDeclaration(declaration.id, {
+            status: 'reviewing',
+            statusText: '复审中',
+            correctionSubmitted: true,
+            correctionSubmitTime: submitTime,
+            timeline: newTimeline,
+            updateTime: submitTime
+          })
+
+          Taro.showToast({ title: '补正材料已提交', icon: 'success', duration: 1500 })
         }
       }
     })
@@ -95,8 +188,6 @@ const DetailPage: React.FC = () => {
     )
   }
 
-  const currentStepIndex = statusSteps.findIndex(s => s.key === declaration.status)
-
   return (
     <PageContainer scroll padding>
       <View className={styles.headerCard}>
@@ -115,44 +206,103 @@ const DetailPage: React.FC = () => {
         </Text>
       </View>
 
-      {declaration.status === 'correction' && declaration.correctionOpinion && (
+      {declaration.status === 'correction' && (
         <View className={styles.correctionCard}>
           <Text className={styles.correctionTitle}>
             <Text className={styles.correctionIcon}>⚠️</Text>
             补正意见
           </Text>
           <Text className={styles.correctionContent}>{declaration.correctionOpinion}</Text>
-          <Button className={styles.correctionBtn} onClick={handleCorrection}>
-            <Text className={styles.btnText}>立即补正材料</Text>
-          </Button>
+
+          {correctionMaterials.length > 0 && (
+            <View style={{ marginTop: '24rpx' }}>
+              <Text className={styles.correctionSubtitle}>需补正材料清单：</Text>
+              <View style={{ marginTop: '16rpx' }}>
+                {correctionMaterials.map((m, idx) => (
+                  <View key={m.id} className={styles.correctionMaterialItem}>
+                    <Text className={styles.correctionMaterialIdx}>{idx + 1}.</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text className={styles.correctionMaterialName}>
+                        {m.name}
+                        <Text style={{ color: '#f53f3f', marginLeft: '8rpx' }}>*</Text>
+                      </Text>
+                      <Text className={styles.correctionMaterialDesc}>{m.description}</Text>
+                    </View>
+                    <Text
+                      className={`${styles.correctionMaterialStatus} ${m.uploaded ? styles.correctionMaterialUploaded : ''}`}
+                    >
+                      {m.uploaded ? '已上传' : '待补传'}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {!declaration.correctionSubmitted ? (
+            <View style={{ display: 'flex', gap: '24rpx', marginTop: '32rpx' }}>
+              <Button className={styles.correctionBtn} onClick={handleCorrection}>
+                <Text className={styles.btnText}>去补传材料</Text>
+              </Button>
+              <Button
+                className={styles.correctionSubmitBtn}
+                onClick={handleSubmitCorrection}
+              >
+                <Text className={styles.btnText}>提交补正</Text>
+              </Button>
+            </View>
+          ) : (
+            <View className={styles.correctionSubmittedBar}>
+              <Text style={{ color: '#00b42a', fontSize: '28rpx', fontWeight: 500 }}>
+                ✅ 补正材料已于 {declaration.correctionSubmitTime} 提交，等待工作人员复审
+              </Text>
+            </View>
+          )}
         </View>
       )}
 
       <View className={styles.statusSection}>
         <Text className={styles.sectionTitle}>
           <Text className={styles.sectionIcon}>📊</Text>
-          办理进度
+          办理轨迹
         </Text>
         <View className={styles.timeline}>
-          {statusSteps.map((step, index) => {
-            const stepStatus = getStepStatus(step.key, declaration.status)
-            if (stepStatus === 'pending' && index > currentStepIndex + 1) return null
-
-            return (
-              <View key={step.key} className={styles.timelineItem}>
-                <View className={`${styles.timelineDot} ${styles[stepStatus]}`} />
-                <View className={styles.timelineContent}>
-                  <Text className={styles.timelineTitle}>{step.title}</Text>
-                  <Text className={styles.timelineTime}>
-                    {stepStatus === 'done' && declaration.updateTime}
-                    {stepStatus === 'active' && '进行中'}
-                    {stepStatus === 'pending' && '待办理'}
+          {timeline.map((node, index) => (
+            <View key={`${node.key}-${index}`} className={styles.timelineItem}>
+              <View
+                className={`${styles.timelineDot} ${styles[node.status]}`}
+              />
+              <View className={styles.timelineContent}>
+                <View className={styles.timelineHeader}>
+                  <Text
+                    className={styles.timelineTitle}
+                    style={{
+                      color:
+                        node.status === 'active'
+                          ? '#165dff'
+                          : node.status === 'done'
+                          ? '#1d2129'
+                          : '#86909c',
+                      fontWeight: node.status === 'active' ? 600 : 500
+                    }}
+                  >
+                    {node.title}
+                    {node.status === 'active' && (
+                      <Text style={{ marginLeft: '16rpx', fontSize: '22rpx', color: '#165dff', fontWeight: 500 }}>
+                        [当前]
+                      </Text>
+                    )}
                   </Text>
-                  <Text className={styles.timelineDesc}>{step.desc}</Text>
+                  <Text className={styles.timelineTime}>
+                    {node.status === 'pending' ? '待办理' : node.time}
+                  </Text>
                 </View>
+                {node.desc && (
+                  <Text className={styles.timelineDesc}>{node.desc}</Text>
+                )}
               </View>
-            )
-          })}
+            </View>
+          ))}
         </View>
       </View>
 
@@ -191,7 +341,7 @@ const DetailPage: React.FC = () => {
           继承人信息
         </Text>
         <Text className={styles.subTitle}>继承情形：{declaration.scenarioName}</Text>
-        {declaration.heirs.map((heir, index) => (
+        {declaration.heirs.map((heir) => (
           <View key={heir.id} className={styles.heirItem}>
             <Text className={styles.heirName}>
               {heir.name}
@@ -212,7 +362,9 @@ const DetailPage: React.FC = () => {
         <View className={styles.infoGrid}>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>产权证号：</Text>
-            <Text className={styles.infoValue}>{declaration.property.certNumber}</Text>
+            <Text className={styles.infoValue}>
+              {declaration.property.certNumber || '待人工核验'}
+            </Text>
           </View>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>房屋坐落：</Text>
@@ -228,7 +380,12 @@ const DetailPage: React.FC = () => {
           </View>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>所有权：</Text>
-            <Text className={styles.infoValue}>{declaration.property.ownership}</Text>
+            <Text className={styles.infoValue}>
+              {declaration.property.ownership}
+              {declaration.property.pendingManualVerify && (
+                <Text style={{ color: '#ff7d00', marginLeft: '12rpx', fontSize: '24rpx' }}>（待人工核验）</Text>
+              )}
+            </Text>
           </View>
         </View>
       </View>
@@ -244,6 +401,18 @@ const DetailPage: React.FC = () => {
               <Text className={styles.materialName}>
                 {material.name}
                 {material.required && <Text style={{ color: '#f53f3f', marginLeft: '8rpx' }}>*</Text>}
+                {declaration.correctionMaterials?.includes(material.id) && (
+                  <Text style={{
+                    color: '#f53f3f',
+                    fontSize: '22rpx',
+                    marginLeft: '12rpx',
+                    background: 'rgba(245,63,63,0.1)',
+                    padding: '4rpx 12rpx',
+                    borderRadius: '8rpx'
+                  }}>
+                    需补正
+                  </Text>
+                )}
               </Text>
               <Text className={styles.materialDesc}>{material.description}</Text>
             </View>
@@ -387,7 +556,7 @@ const DetailPage: React.FC = () => {
         <Button className={styles.secondaryBtn} onClick={() => Taro.navigateBack()}>
           <Text className={styles.secondaryBtnText}>返回</Text>
         </Button>
-        {declaration.status === 'correction' && (
+        {declaration.status === 'correction' && !declaration.correctionSubmitted && (
           <Button className={styles.primaryBtn} onClick={handleCorrection}>
             <Text className={styles.primaryBtnText}>补正材料</Text>
           </Button>

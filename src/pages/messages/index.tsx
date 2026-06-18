@@ -6,6 +6,7 @@ import PageContainer from '@/components/PageContainer'
 import MessageItem from '@/components/MessageItem'
 import EmptyState from '@/components/EmptyState'
 import { useMessagesStore } from '@/store/messages'
+import type { Message } from '@/types'
 import styles from './index.module.scss'
 
 const tabs = [
@@ -51,12 +52,15 @@ const MessagesPage: React.FC = () => {
     setActiveTab(key)
   }
 
-  const handleMessageClick = (id: string) => {
-    const msg = messages.find((m) => m.id === id)
-    if (msg && !msg.read) {
-      markRead(id)
+  const handleMessageClick = (item: Message) => {
+    if (!item.read) {
+      markRead(item.id)
     }
-    console.log('[MessagesPage] 点击消息:', id)
+    if (item.relatedId) {
+      Taro.navigateTo({ url: `/pages/detail/index?id=${item.relatedId}` })
+      return
+    }
+    console.log('[MessagesPage] 点击消息:', item.id)
   }
 
   const handleReadAll = () => {
@@ -129,7 +133,7 @@ const MessagesPage: React.FC = () => {
       {list.length > 0 ? (
         <View className={styles.messageList}>
           {list.map((item) => (
-            <MessageItem key={item.id} item={item} onClick={handleMessageClick} />
+            <MessageItem key={item.id} item={item} onClick={() => handleMessageClick(item)} />
           ))}
         </View>
       ) : (

@@ -75,6 +75,14 @@ export interface AppointmentInfo {
   contactPhone: string
 }
 
+export interface TimelineNode {
+  key: string
+  title: string
+  desc?: string
+  time: string
+  status: 'done' | 'active' | 'pending'
+}
+
 export interface Declaration {
   id: string
   orderNo: string
@@ -93,6 +101,10 @@ export interface Declaration {
   signature?: SignatureInfo
   appointment?: AppointmentInfo
   correctionOpinion?: string
+  correctionMaterials?: string[]
+  correctionSubmitted?: boolean
+  correctionSubmitTime?: string
+  timeline?: TimelineNode[]
   tax?: TaxInfo
   pickup?: PickupInfo
 }

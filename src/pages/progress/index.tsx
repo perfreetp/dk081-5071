@@ -6,7 +6,6 @@ import PageContainer from '@/components/PageContainer'
 import ProgressCard from '@/components/ProgressCard'
 import EmptyState from '@/components/EmptyState'
 import { useDeclarationsStore } from '@/store/declarations'
-import type { Declaration } from '@/types'
 import styles from './index.module.scss'
 
 const tabs = [

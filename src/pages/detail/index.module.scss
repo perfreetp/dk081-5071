@@ -115,17 +115,26 @@
   }
 
   .timelineContent {
+    .timelineHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: $spacing-xs;
+      gap: $spacing-sm;
+    }
+
     .timelineTitle {
       font-size: $font-size-md;
       font-weight: $font-weight-medium;
       color: $color-text-primary;
-      margin-bottom: $spacing-xs;
     }
 
     .timelineTime {
       font-size: $font-size-xs;
       color: $color-text-tertiary;
-      margin-bottom: $spacing-xs;
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding-top: 4rpx;
     }
 
     .timelineDesc {
@@ -161,12 +170,64 @@
     font-size: $font-size-sm;
     color: $color-text-secondary;
     line-height: 1.6;
-    margin-bottom: $spacing-md;
+  }
+
+  .correctionSubtitle {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+  }
+
+  .correctionMaterialItem {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+    background: $color-bg-white;
+    border-radius: $radius-sm;
+    margin-bottom: $spacing-sm;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .correctionMaterialIdx {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    font-weight: $font-weight-medium;
+  }
+
+  .correctionMaterialName {
+    font-size: $font-size-sm;
+    color: $color-text-primary;
+    font-weight: $font-weight-medium;
+    margin-bottom: 4rpx;
+    display: block;
+  }
+
+  .correctionMaterialDesc {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+  }
+
+  .correctionMaterialStatus {
+    font-size: $font-size-xs;
+    color: $color-warning;
+    background: $color-warning-bg;
+    padding: 4rpx $spacing-sm;
+    border-radius: $radius-xs;
+    flex-shrink: 0;
+
+    &.correctionMaterialUploaded {
+      color: $color-success;
+      background: rgba(0, 180, 42, 0.1);
+    }
   }
 
   .correctionBtn {
     @include button-reset;
-    width: 100%;
+    flex: 1;
     height: 72rpx;
     background: $color-error;
     border-radius: $radius-md;
@@ -179,6 +240,30 @@
       font-weight: $font-weight-medium;
       color: $color-text-white;
     }
+  }
+
+  .correctionSubmitBtn {
+    @include button-reset;
+    flex: 1;
+    height: 72rpx;
+    background: $color-primary;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .btnText {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $color-text-white;
+    }
+  }
+
+  .correctionSubmittedBar {
+    margin-top: $spacing-md;
+    padding: $spacing-md;
+    background: rgba(0, 180, 42, 0.08);
+    border-radius: $radius-sm;
   }
 }
 
