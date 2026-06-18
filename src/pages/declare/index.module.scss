@@ -1,0 +1,237 @@
+@use '@/styles/variables.scss' as *;
+
+.stepContainer {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.stepTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+  display: block;
+}
+
+.stepList {
+  display: flex;
+  flex-direction: column;
+}
+
+.stepCard {
+  display: flex;
+  align-items: center;
+  padding: $spacing-lg;
+  background: $color-bg-section;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    background: $color-bg-hover;
+  }
+
+  &.completed {
+    background: $color-success-bg;
+  }
+}
+
+.stepIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  background: $color-primary-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-right: $spacing-lg;
+  flex-shrink: 0;
+}
+
+.completed .stepIcon {
+  background: $color-success-bg;
+}
+
+.stepContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.stepName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-right: $spacing-sm;
+}
+
+.stepStatus {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+}
+
+.statusTodo {
+  background: $color-tag-gray;
+  color: $color-text-tertiary;
+}
+
+.statusDone {
+  background: $color-success-bg;
+  color: $color-success;
+}
+
+.stepPreview {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.stepArrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  margin-left: $spacing-md;
+  flex-shrink: 0;
+}
+
+.summaryCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.summaryTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+
+  .summaryIcon {
+    font-size: $font-size-lg;
+    margin-right: $spacing-sm;
+  }
+}
+
+.summaryRow {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: $spacing-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.summaryLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  width: 140rpx;
+  flex-shrink: 0;
+}
+
+.summaryValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  flex: 1;
+  line-height: $line-height-normal;
+}
+
+.progressTip {
+  background: $color-warning-bg;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-lg;
+  display: flex;
+  align-items: flex-start;
+
+  .tipIcon {
+    font-size: $font-size-lg;
+    margin-right: $spacing-sm;
+    flex-shrink: 0;
+  }
+
+  .tipText {
+    font-size: $font-size-sm;
+    color: $color-warning;
+    line-height: $line-height-normal;
+  }
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-lg});
+  box-shadow: $shadow-float;
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.saveBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-section;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.saveBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+}
+
+.submitBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-primary;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+
+  &.disabled {
+    background: $color-step-pending;
+  }
+}
+
+.submitBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.disabled .submitBtnText {
+  color: $color-text-white;
+}
+
+.bottomPadding {
+  height: calc(#{$button-height-lg} + #{$spacing-xl} + env(safe-area-inset-bottom));
+}

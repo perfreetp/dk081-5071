@@ -1,0 +1,101 @@
+@use '@/styles/variables.scss' as *;
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.readAllBtn {
+  @include button-reset;
+  height: 60rpx;
+  padding: 0 $spacing-lg;
+  border-radius: $radius-button;
+  background: $color-primary-bg;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.readAllText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.tabScroll {
+  white-space: nowrap;
+  margin: 0 (-$page-padding) $spacing-lg;
+  padding: 0 $page-padding;
+}
+
+.tabItem {
+  @include scroll-x-item(auto);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-sm 0;
+  margin-right: $spacing-xl;
+  position: relative;
+}
+
+.tabText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+}
+
+.active .tabText {
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.tabLine {
+  width: 48rpx;
+  height: 6rpx;
+  border-radius: $radius-xs;
+  background: transparent;
+  margin-top: $spacing-xs;
+  transition: all $transition-base;
+}
+
+.active .tabLine {
+  background: $color-primary;
+}
+
+.unreadBadge {
+  position: absolute;
+  top: 0;
+  right: -16rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  border-radius: 16rpx;
+  background: $color-error;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+}
+
+.unreadBadgeText {
+  font-size: 20rpx;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+}
+
+.emptyWrap {
+  margin-top: $spacing-xl * 3;
+}
+
+.messageList {
+  margin: 0 (-$page-padding);
+}

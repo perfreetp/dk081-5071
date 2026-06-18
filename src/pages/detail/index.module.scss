@@ -1,0 +1,399 @@
+@use '@/styles/variables.scss' as *;
+
+.headerCard {
+  background: linear-gradient(135deg, $color-primary 0%, #4080ff 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-lg;
+  color: $color-text-white;
+
+  .statusBadge {
+    display: inline-block;
+    padding: $spacing-xs $spacing-md;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: $radius-sm;
+    font-size: $font-size-sm;
+    margin-bottom: $spacing-md;
+  }
+
+  .orderNo {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-sm;
+  }
+
+  .officeName {
+    font-size: $font-size-sm;
+    opacity: 0.9;
+    margin-bottom: $spacing-sm;
+  }
+
+  .timeInfo {
+    font-size: $font-size-xs;
+    opacity: 0.8;
+  }
+}
+
+.statusSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .sectionIcon {
+    font-size: $font-size-lg;
+  }
+}
+
+.timeline {
+  position: relative;
+  padding-left: $spacing-xl;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 16rpx;
+    top: $spacing-sm;
+    bottom: $spacing-sm;
+    width: 4rpx;
+    background: $color-border;
+  }
+}
+
+.timelineItem {
+  position: relative;
+  padding-bottom: $spacing-xl;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  .timelineDot {
+    position: absolute;
+    left: -$spacing-xl;
+    top: 4rpx;
+    width: 36rpx;
+    height: 36rpx;
+    border-radius: 50%;
+    background: $color-bg-card;
+    border: 4rpx solid $color-border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.done {
+      border-color: $color-success;
+      background: $color-success;
+
+      &::after {
+        content: '✓';
+        color: $color-text-white;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-bold;
+      }
+    }
+
+    &.active {
+      border-color: $color-primary;
+      background: $color-primary;
+    }
+
+    &.pending {
+      border-color: $color-border;
+    }
+  }
+
+  .timelineContent {
+    .timelineTitle {
+      font-size: $font-size-md;
+      font-weight: $font-weight-medium;
+      color: $color-text-primary;
+      margin-bottom: $spacing-xs;
+    }
+
+    .timelineTime {
+      font-size: $font-size-xs;
+      color: $color-text-tertiary;
+      margin-bottom: $spacing-xs;
+    }
+
+    .timelineDesc {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+      line-height: 1.6;
+    }
+  }
+}
+
+.correctionCard {
+  background: rgba(245, 63, 63, 0.08);
+  border-left: 6rpx solid $color-error;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  .correctionTitle {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-error;
+    margin-bottom: $spacing-sm;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .correctionIcon {
+      font-size: $font-size-lg;
+    }
+  }
+
+  .correctionContent {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: 1.6;
+    margin-bottom: $spacing-md;
+  }
+
+  .correctionBtn {
+    @include button-reset;
+    width: 100%;
+    height: 72rpx;
+    background: $color-error;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .btnText {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $color-text-white;
+    }
+  }
+}
+
+.infoSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.infoRow {
+  display: flex;
+  font-size: $font-size-sm;
+
+  .infoLabel {
+    color: $color-text-secondary;
+    width: 180rpx;
+    flex-shrink: 0;
+  }
+
+  .infoValue {
+    color: $color-text-primary;
+    flex: 1;
+  }
+}
+
+.divider {
+  height: 1rpx;
+  background: $color-border-light;
+  margin: $spacing-md 0;
+}
+
+.subTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.heirItem {
+  background: $color-bg-section;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .heirName {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+    margin-bottom: $spacing-xs;
+  }
+
+  .heirInfo {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+  }
+
+  .heirTag {
+    display: inline-block;
+    margin-left: $spacing-sm;
+    padding: 2rpx $spacing-sm;
+    background: $color-primary-bg;
+    color: $color-primary;
+    border-radius: $radius-xs;
+    font-size: $font-size-xs;
+  }
+}
+
+.materialItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .materialInfo {
+    .materialName {
+      font-size: $font-size-sm;
+      color: $color-text-primary;
+      margin-bottom: 2rpx;
+    }
+
+    .materialDesc {
+      font-size: $font-size-xs;
+      color: $color-text-tertiary;
+    }
+  }
+
+  .materialStatus {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $font-size-xs;
+
+    &.uploaded {
+      color: $color-success;
+    }
+
+    &.pending {
+      color: $color-text-tertiary;
+    }
+
+    .statusIcon {
+      font-size: $font-size-md;
+    }
+  }
+}
+
+.actionSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.actionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+}
+
+.actionItem {
+  background: $color-bg-section;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  text-align: center;
+
+  .actionIcon {
+    font-size: 48rpx;
+    margin-bottom: $spacing-sm;
+    display: block;
+  }
+
+  .actionText {
+    font-size: $font-size-sm;
+    color: $color-text-primary;
+    font-weight: $font-weight-medium;
+  }
+
+  .actionDesc {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+    margin-top: $spacing-xs;
+  }
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-lg});
+  box-shadow: $shadow-float;
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.secondaryBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-section;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.secondaryBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+}
+
+.primaryBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-primary;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.primaryBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.bottomPadding {
+  height: calc(#{$button-height-lg} + #{$spacing-xl} + env(safe-area-inset-bottom));
+}

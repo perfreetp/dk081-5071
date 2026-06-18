@@ -1,0 +1,269 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 32rpx);
+}
+
+.sectionCard {
+  background: $color-bg-white;
+  margin: $spacing-lg $spacing-md;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  box-shadow: $shadow-sm;
+
+  .sectionTitle {
+    font-size: 32rpx;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin-bottom: $spacing-lg;
+    padding-left: $spacing-sm;
+    border-left: 6rpx solid $color-primary;
+  }
+}
+
+.stepList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.stepItem {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+
+  .stepNumber {
+    width: 48rpx;
+    height: 48rpx;
+    background: $color-primary;
+    color: $color-text-white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28rpx;
+    font-weight: $font-weight-bold;
+    flex-shrink: 0;
+  }
+
+  .stepContent {
+    flex: 1;
+
+    .stepTitle {
+      font-size: 28rpx;
+      font-weight: $font-weight-medium;
+      color: $color-text-primary;
+      margin-bottom: $spacing-xs;
+    }
+
+    .stepDesc {
+      font-size: 24rpx;
+      color: $color-text-secondary;
+      line-height: 1.6;
+    }
+  }
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.faqItem {
+  border: 2rpx solid $color-border;
+  border-radius: $radius-sm;
+  overflow: hidden;
+
+  .faqHeader {
+    @include button-reset;
+    width: 100%;
+    padding: $spacing-md;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: $color-bg-white;
+
+    .faqQuestion {
+      font-size: 28rpx;
+      color: $color-text-primary;
+      font-weight: $font-weight-medium;
+      text-align: left;
+      flex: 1;
+      padding-right: $spacing-md;
+    }
+
+    .faqIcon {
+      font-size: 24rpx;
+      color: $color-text-tertiary;
+      transition: transform 0.3s;
+      flex-shrink: 0;
+
+      &.expanded {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .faqAnswer {
+    padding: 0 $spacing-md $spacing-md;
+    font-size: 26rpx;
+    color: $color-text-secondary;
+    line-height: 1.8;
+    background: $color-primary-bg;
+  }
+}
+
+.noticeCard {
+  background: linear-gradient(135deg, rgba(22, 93, 255, 0.08) 0%, rgba(22, 93, 255, 0.02) 100%);
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin: $spacing-md;
+
+  .noticeHeader {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
+
+    .noticeIcon {
+      font-size: 36rpx;
+    }
+
+    .noticeTitle {
+      font-size: 30rpx;
+      font-weight: $font-weight-bold;
+      color: $color-primary;
+    }
+  }
+
+  .noticeList {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+
+    .noticeItem {
+      display: flex;
+      gap: $spacing-sm;
+      font-size: 26rpx;
+      color: $color-text-secondary;
+      line-height: 1.6;
+
+      .bullet {
+        color: $color-primary;
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
+.contactCard {
+  background: $color-bg-white;
+  margin: 0 $spacing-md $spacing-lg;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: $shadow-sm;
+
+  .contactInfo {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    .contactIcon {
+      width: 80rpx;
+      height: 80rpx;
+      background: $color-primary-bg;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40rpx;
+    }
+
+    .contactText {
+      .contactLabel {
+        font-size: 24rpx;
+        color: $color-text-tertiary;
+        margin-bottom: 4rpx;
+      }
+
+      .contactPhone {
+        font-size: 32rpx;
+        font-weight: $font-weight-bold;
+        color: $color-primary;
+      }
+    }
+  }
+
+  .callBtn {
+    @include button-reset;
+    padding: $spacing-sm $spacing-lg;
+    background: $color-primary;
+    color: $color-text-white;
+    border-radius: $radius-sm;
+    font-size: 26rpx;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.timelineFlow {
+  position: relative;
+  padding-left: 32rpx;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 12rpx;
+    top: 16rpx;
+    bottom: 16rpx;
+    width: 4rpx;
+    background: $color-primary-bg;
+  }
+}
+
+.flowItem {
+  position: relative;
+  padding-bottom: $spacing-lg;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  .flowDot {
+    position: absolute;
+    left: -32rpx;
+    top: 4rpx;
+    width: 24rpx;
+    height: 24rpx;
+    background: $color-primary;
+    border-radius: 50%;
+    border: 4rpx solid $color-bg-white;
+    box-shadow: 0 0 0 2rpx $color-primary;
+  }
+
+  .flowTitle {
+    font-size: 28rpx;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+    margin-bottom: $spacing-xs;
+  }
+
+  .flowDesc {
+    font-size: 24rpx;
+    color: $color-text-secondary;
+    line-height: 1.6;
+  }
+
+  .flowTime {
+    font-size: 22rpx;
+    color: $color-text-tertiary;
+    margin-top: $spacing-xs;
+  }
+}

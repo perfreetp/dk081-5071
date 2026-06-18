@@ -1,0 +1,166 @@
+@use '@/styles/variables.scss' as *;
+
+.tipCard {
+  background: $color-primary-bg;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  border: 2rpx solid rgba(22, 93, 255, 0.2);
+}
+
+.tipTitle {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+
+  .tipIcon {
+    font-size: $font-size-lg;
+    margin-right: $spacing-sm;
+  }
+
+  .tipText {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+  }
+}
+
+.tipContent {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: block;
+}
+
+.scenarioCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  border: 4rpx solid transparent;
+  transition: all $transition-base;
+
+  &.selected {
+    border-color: $color-primary;
+    background: $color-primary-bg;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.scenarioHeader {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: $spacing-md;
+}
+
+.scenarioIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  background: $color-primary-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-right: $spacing-lg;
+  flex-shrink: 0;
+}
+
+.selected .scenarioIcon {
+  background: $color-bg-card;
+}
+
+.scenarioInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.scenarioName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+  display: block;
+}
+
+.scenarioDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+}
+
+.materialTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.materialList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.materialTag {
+  background: $color-bg-section;
+  padding: 8rpx 20rpx;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.selected .materialTag {
+  background: $color-bg-card;
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-lg});
+  box-shadow: $shadow-float;
+  z-index: 100;
+}
+
+.confirmBtn {
+  @include button-reset;
+  height: $button-height-lg;
+  width: 100%;
+  border-radius: $radius-button;
+  background: $color-primary;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+
+  &.disabled {
+    background: $color-step-pending;
+  }
+}
+
+.confirmBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.bottomPadding {
+  height: calc(#{$button-height-lg} + #{$spacing-xl} + env(safe-area-inset-bottom));
+}

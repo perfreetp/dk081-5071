@@ -1,0 +1,97 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.header {
+  margin-bottom: $spacing-sm;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.name {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.tag {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.required {
+  background-color: $color-error-bg;
+}
+
+.optional {
+  background-color: $color-tag-gray;
+}
+
+.uploaded {
+  background-color: $color-success-bg;
+}
+
+.tagText {
+  font-size: $font-size-xs;
+}
+
+.required .tagText {
+  color: $color-error;
+}
+
+.optional .tagText {
+  color: $color-text-tertiary;
+}
+
+.uploaded .tagText {
+  color: $color-success;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-md;
+  display: block;
+}
+
+.actionBtn {
+  @include button-reset;
+  height: $button-height-sm;
+  min-width: 160rpx;
+  border-radius: $radius-button;
+  background-color: $color-primary;
+  padding: 0 $spacing-lg;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.uploadedBtn {
+  background-color: $color-tag-blue;
+  border: 2rpx solid $color-primary;
+}
+
+.actionText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.uploadedBtn .actionText {
+  color: $color-primary;
+}

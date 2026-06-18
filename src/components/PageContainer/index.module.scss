@@ -1,0 +1,15 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  background-color: $color-bg-page;
+}
+
+.withPadding {
+  padding: $spacing-lg $page-padding;
+}
+
+.safeBottom {
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-xl});
+}

@@ -1,0 +1,192 @@
+@use '@/styles/variables.scss' as *;
+
+.tipCard {
+  background: linear-gradient(135deg, $color-primary-bg 0%, rgba(22, 93, 255, 0.03) 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  border: 2rpx solid rgba(22, 93, 255, 0.2);
+}
+
+.tipTitle {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+
+  .tipIcon {
+    font-size: $font-size-lg;
+    margin-right: $spacing-sm;
+  }
+
+  .tipText {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+  }
+}
+
+.tipContent {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: block;
+}
+
+.scenarioScroll {
+  white-space: nowrap;
+  margin: 0 (-$page-padding) $spacing-lg;
+  padding: 0 $page-padding;
+}
+
+.scenarioCard {
+  @include scroll-x-item(480rpx);
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-right: $spacing-md;
+  box-shadow: $shadow-card;
+  border: 4rpx solid transparent;
+  transition: all $transition-base;
+
+  &.active {
+    border-color: $color-primary;
+    background: $color-primary-bg;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.scenarioHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.scenarioIcon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-md;
+  background: $color-primary-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  margin-right: $spacing-md;
+}
+
+.active .scenarioIcon {
+  background: $color-bg-card;
+}
+
+.scenarioName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.scenarioDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  @include text-ellipsis-multi(2);
+  white-space: normal;
+}
+
+.statsRow {
+  display: flex;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg 0;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.statItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 2rpx solid $color-divider;
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.statNum {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.statItem:nth-child(2) .statNum {
+  color: $color-warning;
+}
+
+.statItem:nth-child(3) .statNum {
+  color: $color-success;
+}
+
+.materialHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.materialTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.materialCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.materialList {
+  margin-bottom: $spacing-xl;
+}
+
+.uploadAllBtn {
+  @include button-reset;
+  height: $button-height-lg;
+  width: 100%;
+  border-radius: $radius-button;
+  background: $color-primary;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.uploadAllBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.bottomPadding {
+  height: calc(#{$button-height-lg} + env(safe-area-inset-bottom) + #{$spacing-lg});
+}

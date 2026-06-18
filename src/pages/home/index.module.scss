@@ -1,0 +1,310 @@
+@use '@/styles/variables.scss' as *;
+
+.banner {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  margin: -$spacing-lg (-$page-padding) $spacing-lg;
+  padding: $spacing-xl $page-padding;
+  padding-top: calc(env(safe-area-inset-top) + #{$spacing-xl});
+  min-height: 320rpx;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -100rpx;
+    right: -100rpx;
+    width: 300rpx;
+    height: 300rpx;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -80rpx;
+    left: -80rpx;
+    width: 240rpx;
+    height: 240rpx;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+  }
+}
+
+.bannerContent {
+  position: relative;
+  z-index: 1;
+}
+
+.greeting {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.subtitle {
+  font-size: $font-size-md;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: $spacing-lg;
+  line-height: $line-height-normal;
+  display: block;
+}
+
+.location {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8rpx 20rpx;
+  border-radius: $radius-round;
+  margin-bottom: $spacing-xl;
+
+  .locationIcon {
+    font-size: $font-size-md;
+    margin-right: 8rpx;
+  }
+
+  .locationText {
+    font-size: $font-size-sm;
+    color: $color-text-white;
+  }
+}
+
+.startBtn {
+  @include button-reset;
+  height: $button-height-lg;
+  width: 100%;
+  border-radius: $radius-button;
+  background: $color-text-white;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.startBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.quickGrid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 (-$spacing-sm) $spacing-lg;
+}
+
+.quickItem {
+  width: 25%;
+  padding: $spacing-sm;
+  box-sizing: border-box;
+}
+
+.quickItemInner {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg $spacing-sm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.quickIcon {
+  font-size: 56rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.quickText {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  text-align: center;
+  @include text-ellipsis;
+}
+
+.section {
+  margin-bottom: $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionMore {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  display: flex;
+  align-items: center;
+
+  .arrow {
+    margin-left: 4rpx;
+  }
+}
+
+.processCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.processTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+  display: block;
+}
+
+.processSteps {
+  display: flex;
+  justify-content: space-between;
+}
+
+.processStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.stepIcon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-round;
+  background: $color-primary-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-sm;
+  font-size: 40rpx;
+}
+
+.stepText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  text-align: center;
+  line-height: $line-height-tight;
+}
+
+.stepLine {
+  position: absolute;
+  top: 44rpx;
+  right: -50%;
+  width: 100%;
+  height: 4rpx;
+  background: $color-primary-bg;
+  z-index: 0;
+}
+
+.guideCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  display: flex;
+  align-items: center;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.guideIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  background: $color-success-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-right: $spacing-lg;
+  flex-shrink: 0;
+}
+
+.guideContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.guideTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+  display: block;
+}
+
+.guideDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+
+.guideArrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  margin-left: $spacing-md;
+}
+
+.noticeScroll {
+  white-space: nowrap;
+  margin: 0 (-$page-padding);
+  padding: 0 $page-padding;
+}
+
+.noticeItem {
+  @include scroll-x-item(520rpx);
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-right: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.noticeHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.noticeTag {
+  background: $color-error-bg;
+  color: $color-error;
+  font-size: $font-size-xs;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  margin-right: $spacing-sm;
+}
+
+.noticeTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.noticeTitle {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}

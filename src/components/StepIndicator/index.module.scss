@@ -1,0 +1,85 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: $spacing-lg 0;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-lg;
+}
+
+.stepItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.stepCircle {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-sm;
+}
+
+.done {
+  background-color: $color-step-done;
+}
+
+.active {
+  background-color: $color-step-active;
+}
+
+.pending {
+  background-color: $color-step-pending;
+}
+
+.checkIcon {
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+}
+
+.stepNum {
+  color: $color-text-white;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+.stepTitle {
+  font-size: $font-size-sm;
+  text-align: center;
+  max-width: 100rpx;
+}
+
+.activeText {
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.pendingText {
+  color: $color-text-tertiary;
+}
+
+.stepLine {
+  flex: 1;
+  height: 4rpx;
+  margin-top: 32rpx;
+  margin-left: -$spacing-sm;
+  margin-right: -$spacing-sm;
+  border-radius: $radius-xs;
+}
+
+.lineDone {
+  background-color: $color-step-done;
+}
+
+.linePending {
+  background-color: $color-border;
+}

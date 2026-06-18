@@ -1,0 +1,423 @@
+@use '@/styles/variables.scss' as *;
+
+.promiseCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.cardTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .cardIcon {
+    font-size: $font-size-lg;
+  }
+}
+
+.promiseContent {
+  background: $color-bg-section;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.8;
+  max-height: 400rpx;
+  overflow-y: auto;
+
+  .promiseTitle {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    text-align: center;
+    margin-bottom: $spacing-lg;
+  }
+
+  .promiseParagraph {
+    margin-bottom: $spacing-md;
+    text-indent: 2em;
+  }
+
+  .promiseList {
+    padding-left: $spacing-lg;
+    margin-bottom: $spacing-md;
+
+    li {
+      margin-bottom: $spacing-sm;
+    }
+  }
+}
+
+.scrollHint {
+  text-align: center;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-sm;
+}
+
+.signatureSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.signatureArea {
+  width: 100%;
+  height: 300rpx;
+  background: $color-bg-section;
+  border: 2rpx dashed $color-border;
+  border-radius: $radius-md;
+  position: relative;
+  overflow: hidden;
+
+  &.hasSignature {
+    border-style: solid;
+    border-color: $color-success;
+  }
+
+  .signaturePlaceholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: $color-text-tertiary;
+
+    .placeholderIcon {
+      font-size: 64rpx;
+      display: block;
+      margin-bottom: $spacing-sm;
+    }
+
+    .placeholderText {
+      font-size: $font-size-sm;
+    }
+  }
+
+  .signatureImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.signatureActions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-md;
+
+  .actionBtn {
+    @include button-reset;
+    flex: 1;
+    height: 72rpx;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-xs;
+    font-size: $font-size-sm;
+
+    &.primaryBtn {
+      background: $color-primary;
+      color: $color-text-white;
+    }
+
+    &.secondaryBtn {
+      background: $color-bg-section;
+      color: $color-text-secondary;
+      border: 2rpx solid $color-border;
+    }
+
+    &.dangerBtn {
+      background: rgba(245, 63, 63, 0.1);
+      color: $color-error;
+    }
+
+    .btnIcon {
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+.heirsConfirmSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.heirsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.heirItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-section;
+  border-radius: $radius-md;
+
+  .heirInfo {
+    flex: 1;
+
+    .heirName {
+      font-size: $font-size-md;
+      font-weight: $font-weight-medium;
+      color: $color-text-primary;
+      margin-bottom: $spacing-xs;
+    }
+
+    .heirRelation {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+    }
+
+    .heirMain {
+      font-size: $font-size-xs;
+      color: $color-primary;
+      background: $color-primary-bg;
+      padding: 2rpx $spacing-sm;
+      border-radius: $radius-xs;
+      margin-left: $spacing-sm;
+    }
+  }
+
+  .confirmStatus {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .statusIcon {
+      font-size: $font-size-lg;
+    }
+
+    .statusText {
+      font-size: $font-size-sm;
+
+      &.confirmed {
+        color: $color-success;
+      }
+
+      &.pending {
+        color: $color-text-tertiary;
+      }
+    }
+  }
+}
+
+.confirmSection {
+  background: rgba(22, 93, 255, 0.05);
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &.checked {
+    border-color: $color-primary;
+    background: rgba(22, 93, 255, 0.1);
+  }
+
+  .checkboxRow {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+
+    .checkbox {
+      width: 40rpx;
+      height: 40rpx;
+      border: 3rpx solid $color-border;
+      border-radius: $radius-xs;
+      flex-shrink: 0;
+      margin-top: 4rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all $transition-base;
+
+      &.checked {
+        background: $color-primary;
+        border-color: $color-primary;
+
+        .checkIcon {
+          color: $color-text-white;
+          font-size: $font-size-sm;
+          font-weight: $font-weight-bold;
+        }
+      }
+    }
+
+    .checkboxLabel {
+      flex: 1;
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+      line-height: 1.6;
+
+      .highlight {
+        color: $color-primary;
+        font-weight: $font-weight-medium;
+      }
+    }
+  }
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-lg});
+  box-shadow: $shadow-float;
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.cancelBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-section;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.cancelBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+}
+
+.saveBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-primary;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    background: $color-text-tertiary;
+  }
+}
+
+.saveBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.bottomPadding {
+  height: calc(#{$button-height-lg} + #{$spacing-xl} + env(safe-area-inset-bottom));
+}
+
+.signaturePadOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+
+  .padHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-lg;
+    background: $color-bg-card;
+
+    .padTitle {
+      font-size: $font-size-md;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+    }
+
+    .padClose {
+      font-size: $font-size-lg;
+      color: $color-text-secondary;
+      padding: $spacing-sm;
+    }
+  }
+
+  .padCanvas {
+    flex: 1;
+    background: $color-bg-white;
+    position: relative;
+
+    .padPlaceholder {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: $color-text-tertiary;
+      pointer-events: none;
+
+      .placeholderIcon {
+        font-size: 80rpx;
+        display: block;
+        margin-bottom: $spacing-md;
+      }
+
+      .placeholderText {
+        font-size: $font-size-md;
+      }
+    }
+  }
+
+  .padFooter {
+    display: flex;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    background: $color-bg-card;
+
+    .padBtn {
+      @include button-reset;
+      flex: 1;
+      height: $button-height-lg;
+      border-radius: $radius-button;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: $font-size-md;
+      font-weight: $font-weight-medium;
+
+      &.clearBtn {
+        background: $color-bg-section;
+        color: $color-text-secondary;
+      }
+
+      &.confirmBtn {
+        background: $color-primary;
+        color: $color-text-white;
+      }
+    }
+  }
+}

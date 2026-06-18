@@ -1,0 +1,222 @@
+@use '@/styles/variables.scss' as *;
+
+.formCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+
+  .cardTitle {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+
+  .heirIndex {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    background: $color-bg-section;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-sm;
+  }
+
+  .deleteBtn {
+    font-size: $font-size-sm;
+    color: $color-error;
+    padding: $spacing-xs $spacing-sm;
+  }
+}
+
+.formItem {
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.formLabel {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+  display: flex;
+  align-items: center;
+
+  .required {
+    color: $color-error;
+    margin-right: 4rpx;
+  }
+}
+
+.formInput {
+  height: 88rpx;
+  background: $color-bg-section;
+  border-radius: $radius-md;
+  padding: 0 $spacing-lg;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+}
+
+.inputField {
+  flex: 1;
+  height: 100%;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.inputPlaceholder {
+  color: $color-text-tertiary;
+}
+
+.inputArrow {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-left: $spacing-sm;
+}
+
+.switchItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 88rpx;
+  background: $color-bg-section;
+  border-radius: $radius-md;
+  padding: 0 $spacing-lg;
+
+  .switchLabel {
+    font-size: $font-size-md;
+    color: $color-text-primary;
+  }
+
+  .switchDesc {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    margin-top: $spacing-xs;
+  }
+}
+
+.addBtn {
+  @include button-reset;
+  width: 100%;
+  height: 88rpx;
+  background: $color-primary-bg;
+  border: 2rpx dashed $color-primary;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+
+  .addIcon {
+    font-size: $font-size-xl;
+    color: $color-primary;
+    font-weight: $font-weight-bold;
+  }
+
+  .addText {
+    font-size: $font-size-md;
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.tipCard {
+  background: rgba(22, 93, 255, 0.08);
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  .tipTitle {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    margin-bottom: $spacing-sm;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .tipIcon {
+      font-size: $font-size-lg;
+    }
+  }
+
+  .tipContent {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: 1.6;
+  }
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-lg});
+  box-shadow: $shadow-float;
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.cancelBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-section;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.cancelBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+}
+
+.saveBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-primary;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.saveBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.bottomPadding {
+  height: calc(#{$button-height-lg} + #{$spacing-xl} + env(safe-area-inset-bottom));
+}
+
+.divider {
+  height: 1rpx;
+  background: $color-border-light;
+  margin: $spacing-lg 0;
+}

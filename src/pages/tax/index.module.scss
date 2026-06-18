@@ -1,0 +1,430 @@
+@use '@/styles/variables.scss' as *;
+
+.headerCard {
+  background: linear-gradient(135deg, $color-warning 0%, #ff9a2e 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-lg;
+  color: $color-text-white;
+  text-align: center;
+
+  .headerTitle {
+    font-size: $font-size-sm;
+    opacity: 0.9;
+    margin-bottom: $spacing-sm;
+  }
+
+  .totalAmount {
+    font-size: 72rpx;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-xs;
+
+    .currency {
+      font-size: $font-size-lg;
+      margin-right: $spacing-xs;
+    }
+  }
+
+  .statusBadge {
+    display: inline-block;
+    padding: $spacing-xs $spacing-md;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: $radius-sm;
+    font-size: $font-size-sm;
+    margin-top: $spacing-sm;
+
+    &.paid {
+      background: rgba(0, 180, 42, 0.8);
+    }
+
+    &.pending {
+      background: rgba(245, 63, 63, 0.8);
+    }
+  }
+
+  .deadline {
+    font-size: $font-size-xs;
+    opacity: 0.9;
+    margin-top: $spacing-sm;
+  }
+}
+
+.taxListSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .sectionIcon {
+    font-size: $font-size-lg;
+  }
+}
+
+.taxItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .taxInfo {
+    .taxName {
+      font-size: $font-size-md;
+      color: $color-text-primary;
+      margin-bottom: $spacing-xs;
+    }
+
+    .taxDesc {
+      font-size: $font-size-xs;
+      color: $color-text-tertiary;
+    }
+  }
+
+  .taxAmount {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-md;
+  margin-top: $spacing-sm;
+  border-top: 2rpx solid $color-border;
+
+  .totalLabel {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+
+  .totalValue {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-warning;
+  }
+}
+
+.propertySection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.infoRow {
+  display: flex;
+  font-size: $font-size-sm;
+
+  .infoLabel {
+    color: $color-text-secondary;
+    width: 180rpx;
+    flex-shrink: 0;
+  }
+
+  .infoValue {
+    color: $color-text-primary;
+    flex: 1;
+  }
+}
+
+.paymentSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.paymentMethods {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.paymentMethod {
+  display: flex;
+  align-items: center;
+  padding: $spacing-lg;
+  background: $color-bg-section;
+  border: 3rpx solid transparent;
+  border-radius: $radius-md;
+  transition: all $transition-base;
+
+  &.selected {
+    border-color: $color-primary;
+    background: rgba(22, 93, 255, 0.05);
+  }
+
+  .methodIcon {
+    font-size: 48rpx;
+    margin-right: $spacing-md;
+  }
+
+  .methodInfo {
+    flex: 1;
+
+    .methodName {
+      font-size: $font-size-md;
+      font-weight: $font-weight-medium;
+      color: $color-text-primary;
+      margin-bottom: $spacing-xs;
+    }
+
+    .methodDesc {
+      font-size: $font-size-xs;
+      color: $color-text-tertiary;
+    }
+  }
+
+  .methodRadio {
+    width: 36rpx;
+    height: 36rpx;
+    border: 3rpx solid $color-border;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.selected {
+      border-color: $color-primary;
+      background: $color-primary;
+
+      &::after {
+        content: '✓';
+        color: $color-text-white;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-bold;
+      }
+    }
+  }
+}
+
+.tipCard {
+  background: rgba(22, 93, 255, 0.08);
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  .tipTitle {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    margin-bottom: $spacing-sm;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .tipIcon {
+      font-size: $font-size-lg;
+    }
+  }
+
+  .tipContent {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: 1.6;
+  }
+}
+
+.voucherSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.voucherInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  .voucherRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: $font-size-sm;
+
+    .voucherLabel {
+      color: $color-text-secondary;
+    }
+
+    .voucherValue {
+      color: $color-text-primary;
+    }
+  }
+}
+
+.voucherAction {
+  margin-top: $spacing-lg;
+  @include button-reset;
+  width: 100%;
+  height: 72rpx;
+  background: $color-primary-bg;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+
+  .actionIcon {
+    font-size: $font-size-md;
+  }
+
+  .actionText {
+    font-size: $font-size-sm;
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-lg});
+  box-shadow: $shadow-float;
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.secondaryBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-section;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.secondaryBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+}
+
+.payBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-warning;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    background: $color-text-tertiary;
+  }
+}
+
+.payBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.bottomPadding {
+  height: calc(#{$button-height-lg} + #{$spacing-xl} + env(safe-area-inset-bottom));
+}
+
+.successOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.successCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-xxl;
+  margin: $spacing-xl;
+  text-align: center;
+
+  .successIcon {
+    width: 120rpx;
+    height: 120rpx;
+    background: $color-success;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto $spacing-lg;
+
+    .iconText {
+      font-size: 64rpx;
+      color: $color-text-white;
+    }
+  }
+
+  .successTitle {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  .successDesc {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-xl;
+    line-height: 1.6;
+  }
+
+  .successBtn {
+    @include button-reset;
+    width: 100%;
+    height: $button-height-lg;
+    background: $color-primary;
+    border-radius: $radius-button;
+
+    .btnText {
+      font-size: $font-size-md;
+      font-weight: $font-weight-semibold;
+      color: $color-text-white;
+    }
+  }
+}

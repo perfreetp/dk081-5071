@@ -1,0 +1,398 @@
+@use '@/styles/variables.scss' as *;
+
+.statsCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+
+  .statsIcon {
+    width: 96rpx;
+    height: 96rpx;
+    background: $color-primary-bg;
+    border-radius: $radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48rpx;
+  }
+
+  .statsInfo {
+    flex: 1;
+
+    .statsTitle {
+      font-size: $font-size-md;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+      margin-bottom: $spacing-xs;
+    }
+
+    .statsDetail {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+    }
+
+    .statsHighlight {
+      color: $color-primary;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  .statsProgress {
+    width: 80rpx;
+    height: 80rpx;
+    position: relative;
+
+    .progressCircle {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient($color-primary var(--progress), $color-bg-section 0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &::before {
+        content: '';
+        width: 60rpx;
+        height: 60rpx;
+        border-radius: 50%;
+        background: $color-bg-card;
+      }
+    }
+
+    .progressText {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $color-primary;
+    }
+  }
+}
+
+.sectionCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .sectionIcon {
+    font-size: $font-size-lg;
+  }
+}
+
+.materialList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.materialItem {
+  background: $color-bg-section;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &.uploaded {
+    border-color: $color-success;
+    background: rgba(0, 180, 42, 0.05);
+  }
+}
+
+.materialHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-sm;
+
+  .materialName {
+    font-size: $font-size-md;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+    flex: 1;
+  }
+
+  .materialTags {
+    display: flex;
+    gap: $spacing-xs;
+    flex-shrink: 0;
+  }
+
+  .tag {
+    font-size: $font-size-xs;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-sm;
+
+    &.required {
+      background: rgba(245, 63, 63, 0.1);
+      color: $color-error;
+    }
+
+    &.optional {
+      background: rgba(134, 144, 156, 0.1);
+      color: $color-text-secondary;
+    }
+
+    &.uploaded {
+      background: rgba(0, 180, 42, 0.1);
+      color: $color-success;
+    }
+  }
+}
+
+.materialDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.5;
+  margin-bottom: $spacing-md;
+}
+
+.materialActions {
+  display: flex;
+  gap: $spacing-md;
+
+  .actionBtn {
+    @include button-reset;
+    flex: 1;
+    height: 64rpx;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-xs;
+    font-size: $font-size-sm;
+
+    &.uploadBtn {
+      background: $color-primary;
+      color: $color-text-white;
+    }
+
+    &.viewBtn {
+      background: $color-primary-bg;
+      color: $color-primary;
+    }
+
+    &.deleteBtn {
+      background: rgba(245, 63, 63, 0.1);
+      color: $color-error;
+    }
+
+    .btnIcon {
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+.uploadPreview {
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  .previewImg {
+    width: 120rpx;
+    height: 120rpx;
+    border-radius: $radius-sm;
+    background: $color-bg-section;
+    object-fit: cover;
+  }
+
+  .previewInfo {
+    flex: 1;
+
+    .previewName {
+      font-size: $font-size-sm;
+      color: $color-text-primary;
+      margin-bottom: $spacing-xs;
+    }
+
+    .previewTime {
+      font-size: $font-size-xs;
+      color: $color-text-tertiary;
+    }
+  }
+}
+
+.tipCard {
+  background: rgba(22, 93, 255, 0.08);
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  .tipTitle {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    margin-bottom: $spacing-sm;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .tipIcon {
+      font-size: $font-size-lg;
+    }
+  }
+
+  .tipContent {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: 1.6;
+  }
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-lg});
+  box-shadow: $shadow-float;
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.cancelBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-section;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.cancelBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+}
+
+.saveBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-primary;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.saveBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.bottomPadding {
+  height: calc(#{$button-height-lg} + #{$spacing-xl} + env(safe-area-inset-bottom));
+}
+
+.uploadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+
+  .uploadingContent {
+    background: $color-bg-card;
+    border-radius: $radius-lg;
+    padding: $spacing-xl;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-md;
+
+    .uploadingSpinner {
+      width: 80rpx;
+      height: 80rpx;
+      border: 6rpx solid $color-border;
+      border-top-color: $color-primary;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .uploadingText {
+      font-size: $font-size-md;
+      color: $color-text-primary;
+    }
+
+    .uploadingProgress {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-xxl $spacing-lg;
+
+  .emptyIcon {
+    font-size: 96rpx;
+    margin-bottom: $spacing-md;
+  }
+
+  .emptyText {
+    font-size: $font-size-md;
+    color: $color-text-secondary;
+  }
+
+  .emptyAction {
+    margin-top: $spacing-lg;
+    @include button-reset;
+    height: $button-height-md;
+    padding: 0 $spacing-xl;
+    background: $color-primary;
+    border-radius: $radius-button;
+
+    .actionText {
+      font-size: $font-size-md;
+      color: $color-text-white;
+      font-weight: $font-weight-medium;
+    }
+  }
+}
