@@ -1,4 +1,5 @@
 import type { Declaration, TimelineNode } from '@/types'
+// trigger rebuild: timeline always shows correction placeholder for reviewing+, hides only done correction branches
 
 /**
  * 按真实办件顺序生成完整办理轨迹，节点数固定为 6~8 个：
@@ -48,18 +49,26 @@ export function buildTimeline(
     { key: 'reviewing', title: '材料审核中', desc: '工作人员正在审核您提交的全部材料', time: tReviewingStart, status: 'pending' }
   ]
 
-  // 补正相关节点：发生过补正（hadCorrection）或当前正处于待补正/复审中则展示
-  const showCorrection =
+  // 补正相关节点：审核中（reviewing）及之后的所有阶段都把「待补正」作为可能路径露出
+  // 但 correctionSubmitted / reviewing2（复审）只有真正发生过补正（correctionSubmitted 或 status===correction）才出现
+  const showCorrectionPlaceholder =
+    status === 'reviewing' ||
     status === 'correction' ||
     !!extra?.correctionSubmitted ||
-    !!extra?.hadCorrection
+    !!extra?.hadCorrection ||
+    ['approved', 'paid', 'completed'].includes(status)
 
-  if (showCorrection) {
+  if (showCorrectionPlaceholder) {
+    // 对于没发生过补正的单子，只露「待补正」作为占位 pending 节点，不出现后面的补正已提交/复审
+    const actuallyHadCorrection =
+      status === 'correction' || !!extra?.correctionSubmitted || !!extra?.hadCorrection
     baseNodes.push({ key: 'correction', title: '待补正材料', desc: '请按意见补充或修正材料后重新提交', time: tCorrection, status: 'pending' })
-    if (status !== 'correction' || !!extra?.correctionSubmitted) {
-      baseNodes.push({ key: 'correctionSubmitted', title: '补正材料已提交', desc: '补正材料已重新提交，等待复审', time: tCorrectionSubmitted, status: 'pending' })
-      // 复审中节点（补正提交后会回到审核）
-      baseNodes.push({ key: 'reviewing2', title: '材料复审中', desc: '工作人员正在复审您补正后的材料', time: tCorrectionSubmitted, status: 'pending' })
+    if (actuallyHadCorrection) {
+      if (status !== 'correction' || !!extra?.correctionSubmitted) {
+        baseNodes.push({ key: 'correctionSubmitted', title: '补正材料已提交', desc: '补正材料已重新提交，等待复审', time: tCorrectionSubmitted, status: 'pending' })
+        // 复审中节点（补正提交后会回到审核）
+        baseNodes.push({ key: 'reviewing2', title: '材料复审中', desc: '工作人员正在复审您补正后的材料', time: tCorrectionSubmitted, status: 'pending' })
+      }
     }
   }
 

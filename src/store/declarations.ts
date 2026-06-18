@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+// trigger rebuild: statusTextMap approved -> '待缴费' to align with detail/timeline/list
 import type { Declaration } from '@/types'
 import { declarations as initialDeclarations } from '@/data/declarations'
 
@@ -27,7 +28,7 @@ export const useDeclarationsStore = create<DeclarationsState>((set, get) => ({
             submitted: '已提交',
             reviewing: '审核中',
             correction: '待补正',
-            approved: '审核通过',
+            approved: '待缴费',
             paid: '待取证',
             completed: '已完成',
             rejected: '已驳回'

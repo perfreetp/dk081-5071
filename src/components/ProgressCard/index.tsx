@@ -15,7 +15,7 @@ const statusConfig: Record<Declaration['status'], { color: string; bgColor: stri
   submitted: { color: '#165DFF', bgColor: '#E8F3FF' },
   reviewing: { color: '#165DFF', bgColor: '#E8F3FF' },
   correction: { color: '#FF7D00', bgColor: '#FFF3E8' },
-  approved: { color: '#00B42A', bgColor: '#E8FFEA' },
+  approved: { color: '#165DFF', bgColor: '#E8F3FF' },
   paid: { color: '#00B42A', bgColor: '#E8FFEA' },
   completed: { color: '#00B42A', bgColor: '#E8FFEA' },
   rejected: { color: '#F53F3F', bgColor: '#FFEBE8' }

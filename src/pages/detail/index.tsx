@@ -45,7 +45,7 @@ const DetailPage: React.FC = () => {
       submitted: '#165dff',
       reviewing: '#165dff',
       correction: '#f53f3f',
-      approved: '#00b42a',
+      approved: '#165dff',
       paid: '#00b42a',
       completed: '#00b42a',
       rejected: '#f53f3f'

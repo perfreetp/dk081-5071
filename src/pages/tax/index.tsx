@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
+// trigger rebuild: tax payment syncs back to declaration timeline, status, progress list
 import PageContainer from '@/components/PageContainer'
 import { useDeclarationsStore } from '@/store/declarations'
+import { useMessagesStore } from '@/store/messages'
+import { buildTimeline } from '@/data/declarations'
 import type { Declaration } from '@/types'
 import styles from './index.module.scss'
 
@@ -17,6 +20,8 @@ const TaxPage: React.FC = () => {
   const [selectedMethod, setSelectedMethod] = useState('wechat')
   const [showSuccess, setShowSuccess] = useState(false)
   const declarations = useDeclarationsStore((s) => s.declarations)
+  const updateDeclaration = useDeclarationsStore((s) => s.updateDeclaration)
+  const addMessage = useMessagesStore((s) => s.addMessage)
 
   useEffect(() => {
     const pages = Taro.getCurrentPages()
@@ -38,10 +43,43 @@ const TaxPage: React.FC = () => {
       title: '确认缴费',
       content: `您即将缴纳税费共计 ¥${declaration.tax.totalAmount.toLocaleString()}，请确认支付。`,
       success: (res) => {
-        if (res.confirm) {
+        if (res.confirm && declaration) {
           Taro.showLoading({ title: '支付中...' })
           setTimeout(() => {
             Taro.hideLoading()
+
+            const now = new Date()
+            const pad = (n: number) => String(n).padStart(2, '0')
+            const payTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+
+            // 重建 timeline：切到 paid 状态并带上缴费时间
+            const newTimeline = buildTimeline('paid', declaration.createTime, payTime, {
+              paidTime: payTime,
+              hadCorrection: !!declaration.correctionOpinion,
+              correctionSubmitted: declaration.correctionSubmitted,
+              correctionSubmitTime: declaration.correctionSubmitTime
+            })
+
+            updateDeclaration(declaration.id, {
+              status: 'paid',
+              statusText: '待取证',
+              tax: {
+                ...declaration.tax!,
+                paid: true,
+                paidTime
+              },
+              timeline: newTimeline,
+              updateTime: payTime
+            })
+
+            const mainHeir = declaration.heirs.find((h) => h.isMain) || declaration.heirs[0]
+            addMessage({
+              type: 'payment',
+              title: '【缴费成功】税费已缴清',
+              content: `申报编号：${declaration.orderNo}\n缴税费额：¥${declaration.tax!.totalAmount.toLocaleString()}\n支付方式：${paymentMethods.find((m) => m.id === selectedMethod)?.name}\n缴费时间：${payTime}\n办理人：${mainHeir?.name || ''}\n\n您的税费已全部缴清，登记机构将尽快制作不动产权证书。证件制作完成后将通过短信通知您取证或邮寄，请留意后续消息。`,
+              relatedId: declaration.id
+            })
+
             setShowSuccess(true)
           }, 2000)
         }

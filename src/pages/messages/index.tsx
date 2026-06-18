@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useRef } from 'react'
+// trigger rebuild: message click dedup via ref throttle + page stack check
 import { View, Text, Button, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import classnames from 'classnames'
@@ -52,11 +53,21 @@ const MessagesPage: React.FC = () => {
     setActiveTab(key)
   }
 
+  const navigatingRef = useRef<Record<string, number>>({})
+
   const handleMessageClick = (item: Message) => {
     if (!item.read) {
       markRead(item.id)
     }
     if (item.relatedId) {
+      const KEY = `detail_${item.relatedId}`
+      const now = Date.now()
+      if (now - (navigatingRef.current[KEY] || 0) < 2000) {
+        // 2 秒内对同一申报重复点击直接忽略，防连点叠加
+        return
+      }
+      navigatingRef.current[KEY] = now
+
       const pages = Taro.getCurrentPages()
       // 检查页面栈中是否已存在相同 id 的详情页
       const existIdx = pages.findIndex((p: any) => {
